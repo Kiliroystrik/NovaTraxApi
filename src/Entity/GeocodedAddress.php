@@ -71,6 +71,8 @@ class GeocodedAddress
     {
         $this->deliveries = new ArrayCollection();
         $this->companies = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
+        $this->isVerified = false;
     }
 
     public function getId(): ?int

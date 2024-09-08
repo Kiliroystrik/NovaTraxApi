@@ -22,9 +22,6 @@ class Delivery
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 14, scale: 3)]
-    private ?string $quantity = null;
-
     #[ORM\Column(length: 50)]
     private ?string $status = null;
 
@@ -58,6 +55,7 @@ class Delivery
     public function __construct()
     {
         $this->productDeliveries = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -85,18 +83,6 @@ class Delivery
     public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    public function getQuantity(): ?string
-    {
-        return $this->quantity;
-    }
-
-    public function setQuantity(string $quantity): static
-    {
-        $this->quantity = $quantity;
 
         return $this;
     }

@@ -84,6 +84,7 @@ class Company
         $this->deliveries = new ArrayCollection();
         $this->products = new ArrayCollection();
         $this->customerOrders = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int

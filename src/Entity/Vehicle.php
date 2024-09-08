@@ -54,6 +54,7 @@ class Vehicle
     {
         $this->vehicleAvailabilities = new ArrayCollection();
         $this->tours = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int

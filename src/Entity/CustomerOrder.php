@@ -46,6 +46,7 @@ class CustomerOrder
     public function __construct()
     {
         $this->deliveries = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
