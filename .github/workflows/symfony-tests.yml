@@ -62,7 +62,7 @@ jobs:
     # Créer la base de données pour l'environnement de test
     - name: Create test database
       run: |
-        psql -h localhost -U novatrax_user_test -d postgres -c "CREATE DATABASE novatrax;"
+        psql -h localhost -U novatrax_user_test -d postgres -c "SELECT 'CREATE DATABASE novatrax' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'novatrax')\gexec"
       env:
         PGPASSWORD: novatrax_password_test
 
