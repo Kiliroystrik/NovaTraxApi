@@ -68,6 +68,10 @@ FROM php:8.3-fpm as final
 # Install Xdebug
 RUN pecl install xdebug && docker-php-ext-enable xdebug
 
+# Installation de l'extension PostgreSQL pour PHP
+RUN apt-get update && apt-get install -y libpq-dev \
+    && docker-php-ext-install pdo_pgsql
+
 # Copy custom Xdebug configuration
 # COPY ./xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
 
@@ -87,8 +91,6 @@ COPY ./public /var/www/html/public
 # Fixer les permissions sur les fichiers de l'application
 RUN chown -R www-data:www-data /var/www/html
 RUN chmod -R 755 /var/www/html
-
-RUN a2enmod rewrite
 
 # Définir l'utilisateur comme www-data pour exécuter Apache
 USER www-data
