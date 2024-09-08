@@ -16,7 +16,7 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_DB: novatrax_test
+          POSTGRES_DB: novatrax
           POSTGRES_USER: novatrax_user_test
           POSTGRES_PASSWORD: novatrax_password_test
         ports:
