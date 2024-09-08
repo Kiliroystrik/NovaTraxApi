@@ -14,15 +14,15 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:${{ env.POSTGRES_VERSION }}
+        image: postgres:16  # Utilisation directe de la version
         env:
-          POSTGRES_DB: ${{ env.POSTGRES_DB }}
-          POSTGRES_USER: ${{ env.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: novatrax_test
+          POSTGRES_USER: novatrax_user_test
+          POSTGRES_PASSWORD: novatrax_password_test
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready -U ${{ env.POSTGRES_USER }}"
+          --health-cmd="pg_isready -U novatrax_user_test"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
@@ -33,7 +33,7 @@ jobs:
         php-version: '8.0'
     - uses: actions/checkout@v4
 
-    # Charger les variables d'environnement du fichier .env.test
+    # Charger les variables d'environnement depuis .env.test (si nécessaire)
     - name: Load environment variables from .env.test
       run: |
         cat .env.test >> $GITHUB_ENV
@@ -65,5 +65,5 @@ jobs:
     # Exécuter les tests PHPUnit
     - name: Execute tests (Unit and Feature tests) via PHPUnit
       env:
-        DATABASE_URL: ${{ env.DATABASE_URL }}
+        DATABASE_URL: postgresql://novatrax_user_test:novatrax_password_test@localhost:5432/novatrax_test?serverVersion=16&charset=utf8
       run: vendor/bin/phpunit
