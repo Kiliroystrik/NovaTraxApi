@@ -40,7 +40,7 @@ jobs:
         echo "POSTGRES_DB=novatrax_test" >> .env.test
         echo "POSTGRES_USER=novatrax_user_test" >> .env.test
         echo "POSTGRES_PASSWORD=novatrax_password_test" >> .env.test
-        echo "DATABASE_URL=postgresql://novatrax_user_test:novatrax_password_test@localhost:5432/novatrax_test?serverVersion=16&charset=utf8" >> .env.test
+        echo "DATABASE_URL=postgresql://novatrax_user_test:novatrax_password_test@localhost:5432/novatrax?serverVersion=16&charset=utf8" >> .env.test
 
     # Charger les variables d'environnement depuis .env.test
     - name: Load environment variables from .env.test
