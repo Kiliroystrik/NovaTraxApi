@@ -33,6 +33,7 @@ class UnitOfMeasure
     public function __construct()
     {
         $this->products = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int

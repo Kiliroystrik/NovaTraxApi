@@ -32,6 +32,11 @@ class DriverAvailability
     #[ORM\JoinColumn(nullable: false)]
     private ?Driver $driver = null;
 
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
