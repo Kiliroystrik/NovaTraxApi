@@ -1,10 +1,10 @@
-name: Symfony
+name: Symfony CI
 
 on:
   push:
-    branches: [ "master", "development" ]
+    branches: [ "main", "development" ]
   pull_request:
-    branches: [ "master", "development" ]
+    branches: [ "main", "development" ]
 
 permissions:
   contents: read
@@ -12,53 +12,32 @@ permissions:
 jobs:
   symfony-tests:
     runs-on: ubuntu-latest
+    
     services:
       postgres:
-        image: postgres:16
+        image: postgres:13
         env:
-          POSTGRES_DB: novatrax
-          POSTGRES_USER: novatrax_user_test
-          POSTGRES_PASSWORD: novatrax_password_test
+          POSTGRES_USER: symfony
+          POSTGRES_PASSWORD: symfony
+          POSTGRES_DB: symfony_test
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready -U novatrax_user_test"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
-    # Setup PHP avec PHP 8.3
     - uses: shivammathur/setup-php@v2
       with:
         php-version: '8.3'
+        
     - uses: actions/checkout@v4
-
-    # Créer le fichier .env.test directement dans le workflow
-    - name: Create .env.test file
-      run: |
-        echo "POSTGRES_VERSION=16" >> .env.test
-        echo "POSTGRES_DB=novatrax" >> .env.test
-        echo "POSTGRES_USER=novatrax_user_test" >> .env.test
-        echo "POSTGRES_PASSWORD=novatrax_password_test" >> .env.test
-        echo "DATABASE_URL=postgresql://novatrax_user_test:novatrax_password_test@localhost:5432/novatrax?serverVersion=16&charset=utf8" >> .env.test
-
-    # Charger les variables d'environnement depuis .env.test
-    - name: Load environment variables from .env.test
-      run: |
-        set -o allexport
-        source .env.test
-        set +o allexport
-
-    # Installer Dockerize pour attendre PostgreSQL
-    - name: Install Dockerize
-      run: |
-        curl -sSL https://github.com/jwilder/dockerize/releases/download/v0.6.1/dockerize-linux-amd64-v0.6.1.tar.gz | sudo tar -C /usr/local/bin -xzv
-
-    # Attendre que PostgreSQL soit prêt
-    - name: Wait for PostgreSQL
-      run: |
-        dockerize -wait tcp://localhost:5432 -timeout 1m
-
+    
+    - name: Copy .env.test.local
+      run: php -r "file_exists('.env.test.local') || copy('.env.test', '.env.test.local');"
+      
     - name: Cache Composer packages
       id: composer-cache
       uses: actions/cache@v3
@@ -67,19 +46,15 @@ jobs:
         key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
         restore-keys: |
           ${{ runner.os }}-php-
+          
     - name: Install Dependencies
       run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-
-    # Créer le schéma de la base de données
-    - name: Create Database Schema
-      run: php bin/console doctrine:schema:create --env=test
-
-    # Charger les fixtures
-    - name: Load Fixtures
-      run: php bin/console doctrine:fixtures:load --no-interaction --env=test
-
-    # Exécuter les tests PHPUnit
+      
     - name: Execute tests (Unit and Feature tests) via PHPUnit
       env:
-        DATABASE_URL: ${{ env.DATABASE_URL }}
-      run: vendor/bin/phpunit
+        DATABASE_URL: postgresql://symfony:symfony@localhost:5432/symfony_test?serverVersion=13&charset=utf8
+      run: |
+        php bin/console doctrine:database:create --env=test
+        php bin/console doctrine:schema:create --env=test
+        php bin/console doctrine:fixtures:load --env=test --no-interaction
+        vendor/bin/phpunit
