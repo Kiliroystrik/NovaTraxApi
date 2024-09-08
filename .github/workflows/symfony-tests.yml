@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16  # Utilisation directe de la version
+        image: postgres:16
         env:
           POSTGRES_DB: novatrax_test
           POSTGRES_USER: novatrax_user_test
@@ -33,10 +33,12 @@ jobs:
         php-version: '8.0'
     - uses: actions/checkout@v4
 
-    # Charger les variables d'environnement depuis .env.test (si nécessaire)
+    # Charger les variables d'environnement depuis .env.test
     - name: Load environment variables from .env.test
       run: |
-        cat .env.test >> $GITHUB_ENV
+        set -o allexport
+        source .env.test
+        set +o allexport
 
     - name: Cache Composer packages
       id: composer-cache
@@ -65,5 +67,5 @@ jobs:
     # Exécuter les tests PHPUnit
     - name: Execute tests (Unit and Feature tests) via PHPUnit
       env:
-        DATABASE_URL: postgresql://novatrax_user_test:novatrax_password_test@localhost:5432/novatrax_test?serverVersion=16&charset=utf8
+        DATABASE_URL: ${{ env.DATABASE_URL }}
       run: vendor/bin/phpunit
