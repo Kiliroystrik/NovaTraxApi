@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20240908191236 extends AbstractMigration
+final class Version20240912153440 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -34,8 +34,7 @@ final class Version20240908191236 extends AbstractMigration
         $this->addSql('CREATE SEQUENCE "user_id_seq" INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE vehicle_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE vehicle_availability_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
-        $this->addSql('CREATE TABLE company (id INT NOT NULL, geocoded_address_id INT DEFAULT NULL, name VARCHAR(100) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, contact_email VARCHAR(50) NOT NULL, contact_phone VARCHAR(50) DEFAULT NULL, PRIMARY KEY(id))');
-        $this->addSql('CREATE INDEX IDX_4FBF094F1B517A96 ON company (geocoded_address_id)');
+        $this->addSql('CREATE TABLE company (id INT NOT NULL, name VARCHAR(100) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, contact_email VARCHAR(50) NOT NULL, contact_phone VARCHAR(50) DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('COMMENT ON COLUMN company.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN company.updated_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('CREATE TABLE customer_order (id INT NOT NULL, company_id INT NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, customer_name VARCHAR(100) NOT NULL, order_date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, expected_delivery_date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, status VARCHAR(50) NOT NULL, PRIMARY KEY(id))');
@@ -102,7 +101,6 @@ final class Version20240908191236 extends AbstractMigration
         $this->addSql('COMMENT ON COLUMN vehicle_availability.end_date IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN vehicle_availability.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN vehicle_availability.updated_at IS \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('ALTER TABLE company ADD CONSTRAINT FK_4FBF094F1B517A96 FOREIGN KEY (geocoded_address_id) REFERENCES geocoded_address (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE customer_order ADD CONSTRAINT FK_3B1CE6A3979B1AD6 FOREIGN KEY (company_id) REFERENCES company (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE delivery ADD CONSTRAINT FK_3781EC1015ED8D43 FOREIGN KEY (tour_id) REFERENCES tour (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE delivery ADD CONSTRAINT FK_3781EC10979B1AD6 FOREIGN KEY (company_id) REFERENCES company (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
@@ -140,7 +138,6 @@ final class Version20240908191236 extends AbstractMigration
         $this->addSql('DROP SEQUENCE "user_id_seq" CASCADE');
         $this->addSql('DROP SEQUENCE vehicle_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE vehicle_availability_id_seq CASCADE');
-        $this->addSql('ALTER TABLE company DROP CONSTRAINT FK_4FBF094F1B517A96');
         $this->addSql('ALTER TABLE customer_order DROP CONSTRAINT FK_3B1CE6A3979B1AD6');
         $this->addSql('ALTER TABLE delivery DROP CONSTRAINT FK_3781EC1015ED8D43');
         $this->addSql('ALTER TABLE delivery DROP CONSTRAINT FK_3781EC10979B1AD6');
