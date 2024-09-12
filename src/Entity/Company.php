@@ -6,6 +6,7 @@ use App\Repository\CompanyRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
 class Company
@@ -13,20 +14,26 @@ class Company
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['companies:read'])]
     private ?int $id = null;
 
+    #[Groups(['companies:read'])]
     #[ORM\Column(length: 100)]
     private ?string $name = null;
 
+    #[Groups(['companies:read'])]
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[Groups(['companies:read'])]
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    #[Groups(['companies:read'])]
     #[ORM\Column(length: 50)]
     private ?string $contactEmail = null;
 
+    #[Groups(['companies:read'])]
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $contactPhone = null;
 
@@ -66,7 +73,7 @@ class Company
     #[ORM\OneToMany(targetEntity: Product::class, mappedBy: 'company', orphanRemoval: true)]
     private Collection $products;
 
-    #[ORM\ManyToOne(inversedBy: 'companies')]
+//    #[Groups(['companies:read'])]
     private ?GeocodedAddress $geocodedAddress = null;
 
     /**

@@ -9,6 +9,7 @@ use Doctrine\Persistence\ObjectManager;
 
 class CompanyFixtures extends Fixture
 {
+    private array $companies = [];
     public function load(ObjectManager $manager): void
     {
         $faker = FakerFactory::create('fr_FR');
@@ -31,11 +32,22 @@ class CompanyFixtures extends Fixture
 
             // Ajouter une référence pour chaque entreprise
             $this->addReference('company-' . $i, $company);
+            $this->addCompany($company);
         }
 
         $manager->flush();
 
         // Ajouter la référence pour la SuperAdmin Company
         $this->addReference('super-admin-company', $superAdminCompany);
+    }
+
+    public function getCompanies() : array
+    {
+        return $this->companies;
+    }
+
+    private function addCompany(Company $company)
+    {
+        $this->companies[] = $company;
     }
 }
