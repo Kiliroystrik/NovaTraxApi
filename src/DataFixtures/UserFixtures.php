@@ -7,10 +7,11 @@ use App\Service\PasswordHashService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory as FakerFactory;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserFixtures extends Fixture
 {
-    public function __construct(private PasswordHashService $passwordHashService) {}
+    public function __construct(private UserPasswordHasherInterface $passwordHashService) {}
 
     public function load(ObjectManager $manager): void
     {
@@ -18,7 +19,7 @@ class UserFixtures extends Fixture
 
         // Init SuperAdmin user
         $superAdminUser = new User();
-        $superAdminUser->setEmail($faker->email());
+        $superAdminUser->setEmail("superadmin@gmail.com");
         $superAdminUser->setRoles(['ROLE_SUPER_ADMIN']);
         $hashedPassword = $this->passwordHashService->hashPassword($superAdminUser, 'password');
         $superAdminUser->setPassword($hashedPassword);

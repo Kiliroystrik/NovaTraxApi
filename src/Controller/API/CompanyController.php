@@ -10,10 +10,10 @@ use Symfony\Component\Routing\Annotation\Route;
 class CompanyController extends AbstractController
 {
     #[Route("/api/companies", methods: ["GET"])]
-    public function getAll(CompanyRepository $companyRepository) : JsonResponse
+    public function getAll(CompanyRepository $companyRepository): JsonResponse
     {
         $companies = $companyRepository->findAll();
 
-        return $this->json($companies,200,[],['groups' => ['companies:read']]);
+        return $this->json($companies, 200, [], ['groups' => ['companies:read']]);
     }
 }

@@ -5,7 +5,6 @@ namespace App\Controller\API;
 use App\DataFixtures\CompanyFixtures;
 use App\Entity\Company;
 use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
-use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class CompanyControllerTest extends WebTestCase
@@ -29,9 +28,37 @@ class CompanyControllerTest extends WebTestCase
         ]);
     }
 
+    /**
+     * Create a client with a default Authorization header.
+     *
+     * @param string $username
+     * @param string $password
+     */
+    protected function createAuthenticatedClient($username = 'superadmin@gmail.com', $password = 'password')
+    {
+        $this->client->request(
+            'POST',
+            '/api/login_check',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            json_encode([
+                'username' => $username,
+                'password' => $password,
+            ])
+        );
+
+        $data = json_decode($this->client->getResponse()->getContent(), true);
+
+        $this->client->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $data['token']));
+
+        return $this->client;
+    }
+
     public function testGetAll(): void
     {
-        // $this->loadFixtures();
+        // Authentification
+        $this->createAuthenticatedClient();
 
         // Envoyer une requête GET à l'API pour récupérer les entreprises
         $this->client->request('GET', '/api/companies');
@@ -46,9 +73,9 @@ class CompanyControllerTest extends WebTestCase
         $responseContent = $this->client->getResponse()->getContent();
         $data = json_decode($responseContent, true);
 
-        // Extraire les noms des entreprises dans la réponse pour une comparaison plus facile
+        // Extraire les noms et les emails des entreprises dans la réponse pour une comparaison plus facile
         $companyNamesInResponse = array_column($data, 'name');
-        $companyEmailsInResponse = array_column($data, 'contact_email');
+        $companyEmailsInResponse = array_column($data, 'contactEmail');
 
         // Récupérer toutes les entreprises de la base de données
         $repository = $this->entityManager->getRepository(Company::class);
@@ -57,7 +84,7 @@ class CompanyControllerTest extends WebTestCase
         // Vérifier que chaque entreprise des fixtures est présente dans la réponse
         foreach ($expectedCompanies as $company) {
             $this->assertContains($company->getName(), $companyNamesInResponse, 'Company name not found in response');
-            // $this->assertContains($company->getContactEmail(), $companyEmailsInResponse, 'Company email not found in response');
+            $this->assertContains($company->getContactEmail(), $companyEmailsInResponse, 'Company email not found in response');
         }
     }
 

@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CompanyRepository::class)]
 class Company
@@ -14,27 +15,32 @@ class Company
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['companies:read'])]
+    #[Groups(['companies:read', 'companies:create'])]
     private ?int $id = null;
 
-    #[Groups(['companies:read'])]
+    #[Groups(['companies:read', 'companies:create'])]
     #[ORM\Column(length: 100)]
+    #[Assert\NotBlank(message: "Le nom de la société ne doit pas être vide.")]
+    #[Assert\Length(max: 100, maxMessage: "Le nom de la société ne peut pas dépasser 100 caractères.")]
     private ?string $name = null;
 
-    #[Groups(['companies:read'])]
+    #[Groups(['companies:read', 'companies:create'])]
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[Groups(['companies:read'])]
+    #[Groups(['companies:read', 'companies:create'])]
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[Groups(['companies:read'])]
+    #[Groups(['companies:read', 'companies:create'])]
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: "L'email de contact est obligatoire.")]
+    #[Assert\Email(message: "L'email {{ value }} n'est pas un email valide.")]
     private ?string $contactEmail = null;
 
-    #[Groups(['companies:read'])]
+    #[Groups(['companies:read', 'companies:create'])]
     #[ORM\Column(length: 50, nullable: true)]
+    #[Assert\Length(max: 50, maxMessage: "Le numéro de téléphone ne peut pas dépasser 50 caractères.")]
     private ?string $contactPhone = null;
 
     /**
@@ -73,7 +79,7 @@ class Company
     #[ORM\OneToMany(targetEntity: Product::class, mappedBy: 'company', orphanRemoval: true)]
     private Collection $products;
 
-//    #[Groups(['companies:read'])]
+    //    #[Groups(['companies:read'])]
     private ?GeocodedAddress $geocodedAddress = null;
 
     /**
