@@ -20,8 +20,8 @@ class Company
 
     #[Groups(['companies:read', 'companies:create'])]
     #[ORM\Column(length: 100)]
-    #[Assert\NotBlank(message: "Le nom de la société ne doit pas être vide.")]
-    #[Assert\Length(max: 100, maxMessage: "Le nom de la société ne peut pas dépasser 100 caractères.")]
+    #[Assert\NotBlank(message: "Le nom de l'entreprise ne doit pas être vide.")]
+    #[Assert\Length(max: 100, maxMessage: "Le nom de l'entreprise ne peut pas dépasser 100 caractères.")]
     private ?string $name = null;
 
     #[Groups(['companies:read', 'companies:create'])]
