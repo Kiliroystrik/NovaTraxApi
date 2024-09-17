@@ -33,9 +33,10 @@ class Company
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[Groups(['companies:read', 'companies:create'])]
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 50, unique: true)]
     #[Assert\NotBlank(message: "L'email de contact est obligatoire.")]
     #[Assert\Email(message: "L'email {{ value }} n'est pas un email valide.")]
+    #[Assert\Unique(message: "L'email {{ value }} est déjà utilisé.")]
     private ?string $contactEmail = null;
 
     #[Groups(['companies:read', 'companies:create'])]

@@ -88,6 +88,12 @@ class CompanyControllerTest extends WebTestCase
         }
     }
 
+    // public function testUpdate(): void
+    // {
+    //     // Authentification
+    //     $this->createAuthenticatedClient();
+    // }
+
     protected function tearDown(): void
     {
         parent::tearDown();

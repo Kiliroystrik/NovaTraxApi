@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -21,6 +22,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[Groups(['companies:read'])]
     #[ORM\Column(length: 180)]
+    #[Assert\NotBlank(message: "L'email est obligatoire.")]
+    #[Assert\Email(message: "L'email {{ value }} n'est pas un email valide.")]
     private ?string $email = null;
 
     /**
@@ -35,14 +38,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[Groups(['companies:read'])]
     #[ORM\Column]
+    #[Assert\NotBlank(message: "Le mot de passe est obligatoire.")]
+    #[Assert\Length(min: 8, minMessage: "Le mot de passe doit contenir au moins {{ limit }} caractères.")]
     private ?string $password = null;
 
     #[Groups(['companies:read'])]
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: "Le prénom est obligatoire.")]
+    #[Assert\Length(max: 50, maxMessage: "Le prénom ne peut pas dépasser {{ limit }} caractères.")]
     private ?string $firstName = null;
 
     #[Groups(['companies:read'])]
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: "Le nom de famille est obligatoire.")]
+    #[Assert\Length(max: 50, maxMessage: "Le nom de famille ne peut pas dépasser {{ limit }} caractères.")]
     private ?string $lastName = null;
 
     #[Groups(['companies:read'])]
@@ -103,7 +112,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_MEMBER';
+        $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
     }
