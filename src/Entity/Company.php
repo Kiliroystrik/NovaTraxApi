@@ -81,6 +81,7 @@ class Company
     private Collection $products;
 
     //    #[Groups(['companies:read'])]
+    #[ORM\ManyToOne(inversedBy: 'companies')]
     private ?GeocodedAddress $geocodedAddress = null;
 
     /**
