@@ -45,6 +45,9 @@ jobs:
         # name: Check HTTPS reachability
         # if: false # Remove this line when the homepage will be configured, or change the path to check
         # run: curl -vk --fail-with-body https://localhost
+      - 
+        name: Fix permissions on bin/console
+        run: docker compose exec -T php chmod +x bin/console
       -
         name: Create test database
         # if: false # Remove this line if Doctrine ORM is installed
