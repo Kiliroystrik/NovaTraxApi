@@ -40,6 +40,12 @@ jobs:
         run: docker compose exec -T php chmod +x bin/console
       - name: Fix permissions on bin/phpunit
         run: docker compose exec -T php chmod +x bin/phpunit
+      - name: Generate JWT keys
+        run: |
+          mkdir -p config/jwt
+          openssl genrsa -out config/jwt/private.pem 2048
+          openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem
+          chmod 644 config/jwt/private.pem config/jwt/public.pem
       - name: Create test database
         run: docker compose exec -T php bin/console -e test doctrine:database:create
       - name: Run migrations
