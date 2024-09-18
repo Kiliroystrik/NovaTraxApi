@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Company;
 use App\Entity\CustomerOrder;
 use App\Entity\Driver;
 use App\Entity\Tour;
@@ -22,7 +23,7 @@ class TourFixtures extends Fixture implements DependentFixtureInterface
         $faker = FakerFactory::create('fr_FR');
 
         for ($i = 0; $i < 10; $i++) {
-            $company = $this->getReference('company-' . $i);
+            $company = $this->getReference('company-' . $i, Company::class);
 
             $customerOrderRepository = $manager->getRepository(CustomerOrder::class);
             $customerOrders = $customerOrderRepository->findOneBy(['company' => $company]);

@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Vehicle;
 use App\Entity\VehicleAvailability;
 use App\Service\PasswordHashService;
 use DateTimeImmutable;
@@ -19,7 +20,7 @@ class VehicleAvailabilityFixtures extends Fixture implements DependentFixtureInt
         $faker = FakerFactory::create('fr_FR');
 
         for ($i = 0; $i < 300; $i++) {
-            $vehicle = $this->getReference('vehicle-' . $i);
+            $vehicle = $this->getReference('vehicle-' . $i, Vehicle::class);
             $vehicleAvailability = new VehicleAvailability();
             $vehicleAvailability->setVehicle($vehicle);
             $vehicleAvailability->setStartDate(DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-1 year', '+1 year')));

@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Driver;
 use App\Entity\DriverAvailability;
 use App\Service\PasswordHashService;
 use DateTimeImmutable;
@@ -19,7 +20,7 @@ class DriverAvailabilityFixtures extends Fixture implements DependentFixtureInte
         $faker = FakerFactory::create('fr_FR');
 
         for ($i = 0; $i < 300; $i++) {
-            $driver = $this->getReference('driver-' . $i);
+            $driver = $this->getReference('driver-' . $i, Driver::class);
             $driverAvailability = new DriverAvailability();
             $driverAvailability->setDriver($driver);
             $driverAvailability->setStartDate(DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-1 year', '+1 year')));

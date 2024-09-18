@@ -24,6 +24,10 @@ doctrine:
                 alias: App
         controller_resolver:
             auto_mapping: false
+        filters:
+            company_filter:
+                class: App\Doctrine\CompanyFilter
+                enabled: false
 
 when@test:
     doctrine:

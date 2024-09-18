@@ -2,7 +2,9 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Company;
 use App\Entity\Product;
+use App\Entity\UnitOfMeasure;
 use App\Service\PasswordHashService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -19,7 +21,7 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
 
         // Pour chaque Company (10), je crée 10 produits
         for ($i = 0; $i < 10; $i++) {
-            $randomCompany = $this->getReference('company-' . $i); // Récupérer chaque entreprise par défaut
+            $randomCompany = $this->getReference('company-' . $i, Company::class); // Récupérer chaque entreprise par défaut
 
             $product = new Product();
             $product->setName($faker->word);
@@ -27,7 +29,7 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
             $product->setDescription($faker->realText(200));
             // J'utilise faker pour generer des nombres aleatoires entre 0 et 8 qui correspond au nombre d'unites de mesure disponibles
             $unitOfMeasure = $faker->numberBetween(0, 8);
-            $product->setUnitOfMeasure($this->getReference('unit-of-measure-' . $unitOfMeasure));
+            $product->setUnitOfMeasure($this->getReference('unit-of-measure-' . $unitOfMeasure, UnitOfMeasure::class));
             $manager->persist($product);
 
             $this->addReference('product-' . $i, $product);

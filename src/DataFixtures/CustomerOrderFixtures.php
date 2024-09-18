@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Company;
 use App\Entity\CustomerOrder;
 use App\Entity\Delivery;
 use App\Service\PasswordHashService;
@@ -25,7 +26,7 @@ class CustomerOrderFixtures extends Fixture implements DependentFixtureInterface
         $breaker = 0;
 
         for ($i = 0; $i < 10; $i++) {
-            $randomCompany = $this->getReference('company-' . $i); // Récupérer chaque entreprise par référence
+            $randomCompany = $this->getReference('company-' . $i, Company::class); // Récupérer chaque entreprise par référence
             for ($j = 0; $j < 10; $j++) {
                 $customerOrder = new CustomerOrder();
                 $customerOrder->setCompany($randomCompany);

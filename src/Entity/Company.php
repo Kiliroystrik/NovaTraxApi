@@ -20,8 +20,8 @@ class Company
 
     #[Groups(['companies:read', 'companies:create'])]
     #[ORM\Column(length: 100)]
-    #[Assert\NotBlank(message: "Le nom de la société ne doit pas être vide.")]
-    #[Assert\Length(max: 100, maxMessage: "Le nom de la société ne peut pas dépasser 100 caractères.")]
+    #[Assert\NotBlank(message: "Le nom de l'entreprise ne doit pas être vide.")]
+    #[Assert\Length(max: 100, maxMessage: "Le nom de l'entreprise ne peut pas dépasser 100 caractères.")]
     private ?string $name = null;
 
     #[Groups(['companies:read', 'companies:create'])]
@@ -33,9 +33,10 @@ class Company
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[Groups(['companies:read', 'companies:create'])]
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 50, unique: true)]
     #[Assert\NotBlank(message: "L'email de contact est obligatoire.")]
     #[Assert\Email(message: "L'email {{ value }} n'est pas un email valide.")]
+    #[Assert\Unique(message: "L'email {{ value }} est déjà utilisé.")]
     private ?string $contactEmail = null;
 
     #[Groups(['companies:read', 'companies:create'])]
@@ -80,6 +81,7 @@ class Company
     private Collection $products;
 
     //    #[Groups(['companies:read'])]
+    #[ORM\ManyToOne(inversedBy: 'companies')]
     private ?GeocodedAddress $geocodedAddress = null;
 
     /**

@@ -2,7 +2,9 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\CustomerOrder;
 use App\Entity\Delivery;
+use App\Entity\GeocodedAddress;
 use App\Service\PasswordHashService;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -24,7 +26,7 @@ class DeliveryFixtures extends Fixture implements DependentFixtureInterface
 
         // J'ai 30 customerOrders donc je déclare for ($i = 0; $i < 30; $i++)
         for ($i = 0; $i < 30; $i++) {
-            $randomCustomerOrder = $this->getReference('customer-order-' . $i);
+            $randomCustomerOrder = $this->getReference('customer-order-' . $i, CustomerOrder::class);
 
             for ($j = 0; $j < 3; $j++) {
                 $delivery = new Delivery();
@@ -40,7 +42,7 @@ class DeliveryFixtures extends Fixture implements DependentFixtureInterface
 
                 // Je set la geocodedAddress de la livraison
                 // Je fais un random sur un chiffre entre 0 et 99
-                $randomGeocodedAddress = $this->getReference('geocoded-address-' . rand(0, 99));
+                $randomGeocodedAddress = $this->getReference('geocoded-address-' . rand(0, 99), GeocodedAddress::class);
                 $delivery->setGeocodedAddress($randomGeocodedAddress);
 
                 $manager->persist($delivery);
