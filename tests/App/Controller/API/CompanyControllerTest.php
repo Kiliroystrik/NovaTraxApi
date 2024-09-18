@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\DataFixtures\CompanyFixtures;
+use App\DataFixtures\UserFixtures;
 use App\Entity\Company;
 use App\Entity\User;
 use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
@@ -26,6 +27,7 @@ class CompanyControllerTest extends WebTestCase
     {
         $this->databaseTool->loadFixtures([
             CompanyFixtures::class,
+            UserFixtures::class
         ]);
     }
 
@@ -160,6 +162,7 @@ class CompanyControllerTest extends WebTestCase
     protected function tearDown(): void
     {
         parent::tearDown();
+        unset($this->databaseTool);
         $this->entityManager->close();
         $this->entityManager = null; // éviter les fuites de mémoire
     }

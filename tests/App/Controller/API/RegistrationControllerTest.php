@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\DataFixtures\CompanyFixtures;
+use App\DataFixtures\UserFixtures;
 use App\DTO\RegistrationDTO;
 use App\Entity\Company;
 use App\Entity\User;
@@ -34,7 +35,10 @@ class RegistrationControllerTest extends WebTestCase
 
     private function loadFixtures(): void
     {
-        $this->databaseTool->loadFixtures([CompanyFixtures::class]);
+        $this->databaseTool->loadFixtures([
+            CompanyFixtures::class,
+            UserFixtures::class
+        ]);
     }
 
     /**
@@ -187,6 +191,7 @@ class RegistrationControllerTest extends WebTestCase
     protected function tearDown(): void
     {
         parent::tearDown();
+        unset($this->databaseTool);
         $this->entityManager->close();
         $this->entityManager = null; // éviter les fuites de mémoire
     }

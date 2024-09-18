@@ -114,6 +114,7 @@ class ApiTokenTest extends WebTestCase
     protected function tearDown(): void
     {
         parent::tearDown();
+        unset($this->databaseTool);
         $this->entityManager->close();
         $this->entityManager = null; // éviter les fuites de mémoire
     }
