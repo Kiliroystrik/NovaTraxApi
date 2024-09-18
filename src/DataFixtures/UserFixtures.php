@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Company;
 use App\Entity\User;
 use App\Service\PasswordHashService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -25,12 +26,12 @@ class UserFixtures extends Fixture
         $superAdminUser->setPassword($hashedPassword);
         $superAdminUser->setFirstName($faker->firstName());
         $superAdminUser->setLastName($faker->lastName());
-        $superAdminUser->setCompany($this->getReference('super-admin-company'));
+        $superAdminUser->setCompany($this->getReference('super-admin-company', Company::class));
         $manager->persist($superAdminUser);
 
         // Init random users
         for ($i = 0; $i < 10; $i++) {
-            $randomCompany = $this->getReference('company-' . $i); // Récupérer chaque entreprise par référence
+            $randomCompany = $this->getReference('company-' . $i, Company::class); // Récupérer chaque entreprise par référence
             for ($j = 0; $j < 10; $j++) {
                 $user = new User();
                 $user->setEmail($faker->email());

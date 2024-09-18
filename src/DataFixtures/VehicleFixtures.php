@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Company;
 use App\Entity\Vehicle;
 use App\Service\PasswordHashService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -20,7 +21,7 @@ class VehicleFixtures extends Fixture implements DependentFixtureInterface
         $breaker = 0;
 
         for ($i = 0; $i < 10; $i++) {
-            $company = $this->getReference('company-' . $i);
+            $company = $this->getReference('company-' . $i, Company::class);
 
             for ($j = 0; $j < 30; $j++) {
                 $vehicle = new Vehicle();

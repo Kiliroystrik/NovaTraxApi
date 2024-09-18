@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Delivery;
 use App\Entity\DeliveryProduct;
 use App\Entity\Product;
 use App\Service\PasswordHashService;
@@ -19,7 +20,7 @@ class DeliveryProductFixtures extends Fixture implements DependentFixtureInterfa
         $faker = FakerFactory::create('fr_FR');
 
         for ($i = 0; $i < 90; $i++) {
-            $delivery = $this->getReference('delivery-' . $i);
+            $delivery = $this->getReference('delivery-' . $i, Delivery::class);
             $deliveryCompany = $delivery->getCompany();
             $productRepository = $manager->getRepository(Product::class);
             $products = $productRepository->findBy(['company' => $deliveryCompany]);
