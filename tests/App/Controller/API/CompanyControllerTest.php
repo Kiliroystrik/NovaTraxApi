@@ -21,6 +21,8 @@ class CompanyControllerTest extends WebTestCase
         $this->client = static::createClient();
         $this->entityManager = $this->client->getContainer()->get('doctrine')->getManager();
         $this->databaseTool = static::getContainer()->get(DatabaseToolCollection::class)->get();
+
+        $this->loadFixtures();
     }
 
     private function loadFixtures(): void

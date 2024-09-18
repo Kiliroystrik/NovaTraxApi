@@ -31,6 +31,8 @@ class RegistrationControllerTest extends WebTestCase
         $this->databaseTool = static::getContainer()->get(DatabaseToolCollection::class)->get();
         $this->validator = static::getContainer()->get(ValidatorInterface::class);
         $this->companyRegistrationService = static::getContainer()->get(CompanyRegistrationService::class);
+
+        $this->loadFixtures();
     }
 
     private function loadFixtures(): void

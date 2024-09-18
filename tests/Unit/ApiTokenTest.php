@@ -21,6 +21,11 @@ class ApiTokenTest extends WebTestCase
         $this->databaseTool = static::getContainer()->get(DatabaseToolCollection::class)->get();
 
         // Charger les fixtures avant chaque test
+        $this->loadFixtures();
+    }
+
+    private function loadFixtures(): void
+    {
         $this->databaseTool->loadFixtures([
             CompanyFixtures::class,  // Si nécessaire
             UserFixtures::class      // Charger la fixture utilisateur
