@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Doctrine;
+namespace App\Doctrine\Filters;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Filter\SQLFilter;

@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20240917131403 extends AbstractMigration
+final class Version20240922144714 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -66,7 +66,8 @@ final class Version20240917131403 extends AbstractMigration
         $this->addSql('COMMENT ON COLUMN driver_availability.updated_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN driver_availability.start_date IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN driver_availability.end_date IS \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('CREATE TABLE geocoded_address (id INT NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, street_name VARCHAR(255) NOT NULL, full_address TEXT DEFAULT NULL, city VARCHAR(255) NOT NULL, postal_code VARCHAR(20) NOT NULL, department VARCHAR(10) DEFAULT NULL, country VARCHAR(100) NOT NULL, latitude NUMERIC(10, 8) DEFAULT NULL, longitude NUMERIC(11, 8) DEFAULT NULL, street_number VARCHAR(10) NOT NULL, is_verified BOOLEAN NOT NULL, source VARCHAR(20) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE geocoded_address (id INT NOT NULL, company_id INT NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, street_name VARCHAR(255) NOT NULL, full_address TEXT DEFAULT NULL, city VARCHAR(255) NOT NULL, postal_code VARCHAR(20) NOT NULL, department VARCHAR(10) DEFAULT NULL, country VARCHAR(100) NOT NULL, latitude NUMERIC(10, 8) DEFAULT NULL, longitude NUMERIC(11, 8) DEFAULT NULL, street_number VARCHAR(10) NOT NULL, is_verified BOOLEAN NOT NULL, source VARCHAR(20) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE INDEX IDX_A064104A979B1AD6 ON geocoded_address (company_id)');
         $this->addSql('COMMENT ON COLUMN geocoded_address.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN geocoded_address.updated_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('CREATE TABLE product (id INT NOT NULL, company_id INT NOT NULL, unit_of_measure_id INT NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, name VARCHAR(100) NOT NULL, description TEXT DEFAULT NULL, PRIMARY KEY(id))');
@@ -111,6 +112,7 @@ final class Version20240917131403 extends AbstractMigration
         $this->addSql('ALTER TABLE delivery_product ADD CONSTRAINT FK_D954BB7312136921 FOREIGN KEY (delivery_id) REFERENCES delivery (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE driver ADD CONSTRAINT FK_11667CD9979B1AD6 FOREIGN KEY (company_id) REFERENCES company (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE driver_availability ADD CONSTRAINT FK_1AD4A240C3423909 FOREIGN KEY (driver_id) REFERENCES driver (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE geocoded_address ADD CONSTRAINT FK_A064104A979B1AD6 FOREIGN KEY (company_id) REFERENCES company (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE product ADD CONSTRAINT FK_D34A04AD979B1AD6 FOREIGN KEY (company_id) REFERENCES company (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE product ADD CONSTRAINT FK_D34A04ADDA4E2C90 FOREIGN KEY (unit_of_measure_id) REFERENCES unit_of_measure (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE tour ADD CONSTRAINT FK_6AD1F969C3423909 FOREIGN KEY (driver_id) REFERENCES driver (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
@@ -148,6 +150,7 @@ final class Version20240917131403 extends AbstractMigration
         $this->addSql('ALTER TABLE delivery_product DROP CONSTRAINT FK_D954BB7312136921');
         $this->addSql('ALTER TABLE driver DROP CONSTRAINT FK_11667CD9979B1AD6');
         $this->addSql('ALTER TABLE driver_availability DROP CONSTRAINT FK_1AD4A240C3423909');
+        $this->addSql('ALTER TABLE geocoded_address DROP CONSTRAINT FK_A064104A979B1AD6');
         $this->addSql('ALTER TABLE product DROP CONSTRAINT FK_D34A04AD979B1AD6');
         $this->addSql('ALTER TABLE product DROP CONSTRAINT FK_D34A04ADDA4E2C90');
         $this->addSql('ALTER TABLE tour DROP CONSTRAINT FK_6AD1F969C3423909');

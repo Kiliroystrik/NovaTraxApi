@@ -80,15 +80,19 @@ class Company
     #[ORM\OneToMany(targetEntity: Product::class, mappedBy: 'company', orphanRemoval: true)]
     private Collection $products;
 
-    //    #[Groups(['companies:read'])]
-    #[ORM\ManyToOne(inversedBy: 'companies')]
-    private ?GeocodedAddress $geocodedAddress = null;
+
 
     /**
      * @var Collection<int, CustomerOrder>
      */
     #[ORM\OneToMany(targetEntity: CustomerOrder::class, mappedBy: 'company', orphanRemoval: true)]
     private Collection $customerOrders;
+
+    /**
+     * @var Collection<int, GeocodedAddress>
+     */
+    #[ORM\OneToMany(targetEntity: GeocodedAddress::class, mappedBy: 'company', orphanRemoval: true)]
+    private Collection $GeocodedAddresses;
 
     public function __construct()
     {
@@ -100,6 +104,7 @@ class Company
         $this->products = new ArrayCollection();
         $this->customerOrders = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
+        $this->GeocodedAddresses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -347,18 +352,6 @@ class Company
         return $this;
     }
 
-    public function getGeocodedAddress(): ?GeocodedAddress
-    {
-        return $this->geocodedAddress;
-    }
-
-    public function setGeocodedAddress(?GeocodedAddress $geocodedAddress): static
-    {
-        $this->geocodedAddress = $geocodedAddress;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, CustomerOrder>
      */
@@ -383,6 +376,36 @@ class Company
             // set the owning side to null (unless already changed)
             if ($customerOrder->getCompany() === $this) {
                 $customerOrder->setCompany(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, GeocodedAddress>
+     */
+    public function getGeocodedAddresses(): Collection
+    {
+        return $this->GeocodedAddresses;
+    }
+
+    public function addGeocodedAddress(GeocodedAddress $geocodedAddress): static
+    {
+        if (!$this->GeocodedAddresses->contains($geocodedAddress)) {
+            $this->GeocodedAddresses->add($geocodedAddress);
+            $geocodedAddress->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGeocodedAddress(GeocodedAddress $geocodedAddress): static
+    {
+        if ($this->GeocodedAddresses->removeElement($geocodedAddress)) {
+            // set the owning side to null (unless already changed)
+            if ($geocodedAddress->getCompany() === $this) {
+                $geocodedAddress->setCompany(null);
             }
         }
 

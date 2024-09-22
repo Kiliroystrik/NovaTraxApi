@@ -61,16 +61,13 @@ class GeocodedAddress
     #[ORM\OneToMany(targetEntity: Delivery::class, mappedBy: 'geocodedAddress', orphanRemoval: true)]
     private Collection $deliveries;
 
-    /**
-     * @var Collection<int, Company>
-     */
-    #[ORM\OneToMany(targetEntity: Company::class, mappedBy: 'geocodedAddress')]
-    private Collection $companies;
+    #[ORM\ManyToOne(inversedBy: 'GeocodedAddresses')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Company $company = null;
 
     public function __construct()
     {
         $this->deliveries = new ArrayCollection();
-        $this->companies = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
         $this->isVerified = false;
     }
@@ -267,32 +264,14 @@ class GeocodedAddress
         return $this;
     }
 
-    /**
-     * @return Collection<int, Company>
-     */
-    public function getCompanies(): Collection
+    public function getCompany(): ?Company
     {
-        return $this->companies;
+        return $this->company;
     }
 
-    public function addCompany(Company $company): static
+    public function setCompany(?Company $company): static
     {
-        if (!$this->companies->contains($company)) {
-            $this->companies->add($company);
-            $company->setGeocodedAddress($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCompany(Company $company): static
-    {
-        if ($this->companies->removeElement($company)) {
-            // set the owning side to null (unless already changed)
-            if ($company->getGeocodedAddress() === $this) {
-                $company->setGeocodedAddress(null);
-            }
-        }
+        $this->company = $company;
 
         return $this;
     }

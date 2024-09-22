@@ -49,7 +49,8 @@ class RegistrationController extends AbstractController
             $this->entityManager->persist($user);
             $this->entityManager->flush();
         } catch (\Exception $e) {
-            return new JsonResponse(['error' => 'Erreur lors de la création de la entreprise et de l\'utilisateur.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            // return new JsonResponse(['error' => 'Erreur lors de la création de l\'entreprise et de l\'utilisateur.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         // Retourne la réponse avec les détails de l'entreprise créée

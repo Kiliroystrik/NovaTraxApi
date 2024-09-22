@@ -22,6 +22,11 @@ final class AccessCompanyDatasListener
     {
         $controller = $event->getController();
 
+        // Vérifier si le contrôleur est bien un tableau (contrôleur + méthode)
+        if (!is_array($controller)) {
+            return; // Ne rien faire si ce n'est pas un tableau (comme pour ErrorController)
+        }
+
         // Vérification spécifique pour l'action registerCompany dans RegistrationController
         if ($controller[0] instanceof \App\Controller\API\RegistrationController && $controller[1] === 'registerCompany') {
             return; // Pas de filtre appliqué pour cette action
