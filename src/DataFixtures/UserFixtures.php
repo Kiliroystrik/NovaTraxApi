@@ -32,16 +32,29 @@ class UserFixtures extends Fixture
         // Init random users
         for ($i = 0; $i < 10; $i++) {
             $randomCompany = $this->getReference('company-' . $i, Company::class); // Récupérer chaque entreprise par référence
-            for ($j = 0; $j < 10; $j++) {
+            if ($i == 0) {
                 $user = new User();
-                $user->setEmail($faker->email());
-                $user->setRoles(['ROLE_MEMBER']);
+                $user->setEmail("admin@gmail.com");
+                $user->setRoles(['ROLE_ADMIN']);
                 $hashedPassword = $this->passwordHashService->hashPassword($user, 'password');
                 $user->setPassword($hashedPassword);
                 $user->setFirstName($faker->firstName());
                 $user->setLastName($faker->lastName());
                 $user->setCompany($randomCompany);
                 $manager->persist($user);
+            } else {
+
+                for ($j = 0; $j < 10; $j++) {
+                    $user = new User();
+                    $user->setEmail($faker->email());
+                    $user->setRoles(['ROLE_MEMBER']);
+                    $hashedPassword = $this->passwordHashService->hashPassword($user, 'password');
+                    $user->setPassword($hashedPassword);
+                    $user->setFirstName($faker->firstName());
+                    $user->setLastName($faker->lastName());
+                    $user->setCompany($randomCompany);
+                    $manager->persist($user);
+                }
             }
         }
 

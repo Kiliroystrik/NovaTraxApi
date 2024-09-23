@@ -24,7 +24,7 @@ class GeocodedAddressRepository extends ServiceEntityRepository
     //        return $this->createQueryBuilder('g')
     //            ->andWhere('g.exampleField = :val')
     //            ->setParameter('val', $value)
-    //            ->orderBy('g.id', 'ASC')
+    //            ->clientOrderBy('g.id', 'ASC')
     //            ->setMaxResults(10)
     //            ->getQuery()
     //            ->getResult()

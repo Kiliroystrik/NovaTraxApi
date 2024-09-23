@@ -2,39 +2,39 @@
 
 namespace App\Repository;
 
-use App\Entity\UnitOfMeasure;
+use App\Entity\ClientOrder;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<UnitOfMeasure>
+ * @extends ServiceEntityRepository<ClientOrder>
  */
-class UnitOfMeasureRepository extends ServiceEntityRepository
+class ClientOrderRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, UnitOfMeasure::class);
+        parent::__construct($registry, ClientOrder::class);
     }
 
     //    /**
-    //     * @return UnitOfMeasure[] Returns an array of UnitOfMeasure objects
+    //     * @return ClientOrder[] Returns an array of ClientOrder objects
     //     */
     //    public function findByExampleField($value): array
     //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
+    //        return $this->createQueryBuilder('c')
+    //            ->andWhere('c.exampleField = :val')
     //            ->setParameter('val', $value)
-    //            ->clientOrderBy('u.id', 'ASC')
+    //            ->clientOrderBy('c.id', 'ASC')
     //            ->setMaxResults(10)
     //            ->getQuery()
     //            ->getResult()
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?UnitOfMeasure
+    //    public function findOneBySomeField($value): ?ClientOrder
     //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
+    //        return $this->createQueryBuilder('c')
+    //            ->andWhere('c.exampleField = :val')
     //            ->setParameter('val', $value)
     //            ->getQuery()
     //            ->getOneOrNullResult()

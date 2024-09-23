@@ -24,7 +24,7 @@ class VehicleAvailabilityRepository extends ServiceEntityRepository
     //        return $this->createQueryBuilder('v')
     //            ->andWhere('v.exampleField = :val')
     //            ->setParameter('val', $value)
-    //            ->orderBy('v.id', 'ASC')
+    //            ->clientOrderBy('v.id', 'ASC')
     //            ->setMaxResults(10)
     //            ->getQuery()
     //            ->getResult()

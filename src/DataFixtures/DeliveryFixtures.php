@@ -2,7 +2,7 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\CustomerOrder;
+use App\Entity\ClientOrder;
 use App\Entity\Delivery;
 use App\Entity\GeocodedAddress;
 use App\Service\PasswordHashService;
@@ -24,16 +24,16 @@ class DeliveryFixtures extends Fixture implements DependentFixtureInterface
 
         $breaker = 0;
 
-        // J'ai 30 customerOrders donc je déclare for ($i = 0; $i < 30; $i++)
-        for ($i = 0; $i < 30; $i++) {
-            $randomCustomerOrder = $this->getReference('customer-order-' . $i, CustomerOrder::class);
+        // J'ai 30 clientOrders donc je déclare for ($i = 0; $i < 30; $i++)
+        for ($i = 0; $i < 100; $i++) {
+            $randomClientOrder = $this->getReference('clientOrder-' . $i, ClientOrder::class);
 
             for ($j = 0; $j < 3; $j++) {
                 $delivery = new Delivery();
-                $delivery->setCustomerOrder($randomCustomerOrder);
-                $delivery->setCompany($randomCustomerOrder->getCompany());
-                $customerOrderDate = $randomCustomerOrder->getOrderDate()->format('Y-m-d');
-                $expectedDeliveryDate = DateTimeImmutable::createFromMutable($faker->dateTimeBetween($customerOrderDate, '+1 year'));
+                $delivery->setClientOrder($randomClientOrder);
+                $delivery->setCompany($randomClientOrder->getCompany());
+                $clientOrderDate = $randomClientOrder->getClientOrderDate()->format('Y-m-d');
+                $expectedDeliveryDate = DateTimeImmutable::createFromMutable($faker->dateTimeBetween($clientOrderDate, '+1 year'));
                 $delivery->setExpectedDeliveryDate($expectedDeliveryDate);
                 $expectedDeliveryDateToString = $expectedDeliveryDate->format('Y-m-d');
                 $actualDeliveryDate = DateTimeImmutable::createFromMutable($faker->dateTimeBetween($expectedDeliveryDateToString, '+1 year'));
@@ -58,7 +58,7 @@ class DeliveryFixtures extends Fixture implements DependentFixtureInterface
     public function getDependencies()
     {
         return [
-            CustomerOrderFixtures::class,
+            ClientOrderFixtures::class,
             GeocodedAddressFixtures::class,
         ];
     }

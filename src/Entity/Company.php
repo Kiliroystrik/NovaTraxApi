@@ -83,16 +83,22 @@ class Company
 
 
     /**
-     * @var Collection<int, CustomerOrder>
+     * @var Collection<int, ClientOrder>
      */
-    #[ORM\OneToMany(targetEntity: CustomerOrder::class, mappedBy: 'company', orphanRemoval: true)]
-    private Collection $customerOrders;
+    #[ORM\OneToMany(targetEntity: ClientOrder::class, mappedBy: 'company', orphanRemoval: true)]
+    private Collection $clientOrders;
 
     /**
      * @var Collection<int, GeocodedAddress>
      */
     #[ORM\OneToMany(targetEntity: GeocodedAddress::class, mappedBy: 'company', orphanRemoval: true)]
     private Collection $GeocodedAddresses;
+
+    /**
+     * @var Collection<int, Client>
+     */
+    #[ORM\OneToMany(targetEntity: Client::class, mappedBy: 'company', orphanRemoval: true)]
+    private Collection $clients;
 
     public function __construct()
     {
@@ -102,9 +108,10 @@ class Company
         $this->tours = new ArrayCollection();
         $this->deliveries = new ArrayCollection();
         $this->products = new ArrayCollection();
-        $this->customerOrders = new ArrayCollection();
+        $this->clientOrders = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
         $this->GeocodedAddresses = new ArrayCollection();
+        $this->clients = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -353,29 +360,29 @@ class Company
     }
 
     /**
-     * @return Collection<int, CustomerOrder>
+     * @return Collection<int, ClientOrder>
      */
-    public function getCustomerOrders(): Collection
+    public function getClientOrders(): Collection
     {
-        return $this->customerOrders;
+        return $this->clientOrders;
     }
 
-    public function addCustomerOrder(CustomerOrder $customerOrder): static
+    public function addClientOrder(ClientOrder $clientOrder): static
     {
-        if (!$this->customerOrders->contains($customerOrder)) {
-            $this->customerOrders->add($customerOrder);
-            $customerOrder->setCompany($this);
+        if (!$this->clientOrders->contains($clientOrder)) {
+            $this->clientOrders->add($clientOrder);
+            $clientOrder->setCompany($this);
         }
 
         return $this;
     }
 
-    public function removeCustomerOrder(CustomerOrder $customerOrder): static
+    public function removeClientOrder(ClientOrder $clientOrder): static
     {
-        if ($this->customerOrders->removeElement($customerOrder)) {
+        if ($this->clientOrders->removeElement($clientOrder)) {
             // set the owning side to null (unless already changed)
-            if ($customerOrder->getCompany() === $this) {
-                $customerOrder->setCompany(null);
+            if ($clientOrder->getCompany() === $this) {
+                $clientOrder->setCompany(null);
             }
         }
 
@@ -406,6 +413,36 @@ class Company
             // set the owning side to null (unless already changed)
             if ($geocodedAddress->getCompany() === $this) {
                 $geocodedAddress->setCompany(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Client>
+     */
+    public function getClients(): Collection
+    {
+        return $this->clients;
+    }
+
+    public function addClient(Client $client): static
+    {
+        if (!$this->clients->contains($client)) {
+            $this->clients->add($client);
+            $client->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeClient(Client $client): static
+    {
+        if ($this->clients->removeElement($client)) {
+            // set the owning side to null (unless already changed)
+            if ($client->getCompany() === $this) {
+                $client->setCompany(null);
             }
         }
 

@@ -24,7 +24,7 @@ class TourRepository extends ServiceEntityRepository
     //        return $this->createQueryBuilder('t')
     //            ->andWhere('t.exampleField = :val')
     //            ->setParameter('val', $value)
-    //            ->orderBy('t.id', 'ASC')
+    //            ->clientOrderBy('t.id', 'ASC')
     //            ->setMaxResults(10)
     //            ->getQuery()
     //            ->getResult()

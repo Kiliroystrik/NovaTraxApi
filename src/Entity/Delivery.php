@@ -46,7 +46,7 @@ class Delivery
 
     #[ORM\ManyToOne(inversedBy: 'deliveries')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?CustomerOrder $customerOrder = null;
+    private ?ClientOrder $clientOrder = null;
 
     #[ORM\ManyToOne(inversedBy: 'deliveries')]
     #[ORM\JoinColumn(nullable: false)]
@@ -177,14 +177,14 @@ class Delivery
         return $this;
     }
 
-    public function getCustomerOrder(): ?CustomerOrder
+    public function getClientOrder(): ?ClientOrder
     {
-        return $this->customerOrder;
+        return $this->clientOrder;
     }
 
-    public function setCustomerOrder(?CustomerOrder $customerOrder): static
+    public function setClientOrder(?ClientOrder $clientOrder): static
     {
-        $this->customerOrder = $customerOrder;
+        $this->clientOrder = $clientOrder;
 
         return $this;
     }
