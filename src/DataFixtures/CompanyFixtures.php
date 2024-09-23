@@ -41,7 +41,7 @@ class CompanyFixtures extends Fixture
         $this->addReference('super-admin-company', $superAdminCompany);
     }
 
-    public function getCompanies() : array
+    public function getCompanies(): array
     {
         return $this->companies;
     }

@@ -3,7 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Company;
-use App\Entity\CustomerOrder;
+use App\Entity\ClientOrder;
 use App\Entity\Driver;
 use App\Entity\Tour;
 use App\Entity\Vehicle;
@@ -25,12 +25,12 @@ class TourFixtures extends Fixture implements DependentFixtureInterface
         for ($i = 0; $i < 10; $i++) {
             $company = $this->getReference('company-' . $i, Company::class);
 
-            $customerOrderRepository = $manager->getRepository(CustomerOrder::class);
-            $customerOrders = $customerOrderRepository->findOneBy(['company' => $company]);
+            $clientOrderRepository = $manager->getRepository(ClientOrder::class);
+            $clientOrders = $clientOrderRepository->findOneBy(['company' => $company]);
 
-            foreach ($customerOrders as $customerOrder) {
+            foreach ($clientOrders as $clientOrder) {
 
-                $deliveries = $customerOrder->getDeliveries();
+                $deliveries = $clientOrder->getDeliveries();
 
                 $tour = new Tour();
                 foreach ($deliveries as $delivery) {

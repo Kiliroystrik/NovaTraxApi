@@ -110,7 +110,7 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/doctrine/common" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/validator" />
     </content>
-    <orderEntry type="inheritedJdk" />
-    <orderEntry type="sourceFolder" forTests="false" />
+    <clientOrderEntry type="inheritedJdk" />
+    <clientOrderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

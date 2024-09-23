@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20240922144714 extends AbstractMigration
+final class Version20240923191643 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,8 +20,9 @@ final class Version20240922144714 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
+        $this->addSql('CREATE SEQUENCE client_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE client_order_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE company_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
-        $this->addSql('CREATE SEQUENCE customer_order_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE delivery_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE delivery_product_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE driver_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
@@ -34,20 +35,24 @@ final class Version20240922144714 extends AbstractMigration
         $this->addSql('CREATE SEQUENCE "user_id_seq" INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE vehicle_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE vehicle_availability_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE TABLE client (id INT NOT NULL, company_id INT NOT NULL, name VARCHAR(100) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE INDEX IDX_C7440455979B1AD6 ON client (company_id)');
+        $this->addSql('CREATE TABLE client_order (id INT NOT NULL, company_id INT NOT NULL, client_id INT NOT NULL, order_number VARCHAR(20) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, client_order_date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, expected_delivery_date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, status VARCHAR(50) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE UNIQUE INDEX UNIQ_56440F2F551F0F81 ON client_order (order_number)');
+        $this->addSql('CREATE INDEX IDX_56440F2F979B1AD6 ON client_order (company_id)');
+        $this->addSql('CREATE INDEX IDX_56440F2F19EB6921 ON client_order (client_id)');
+        $this->addSql('COMMENT ON COLUMN client_order.created_at IS \'(DC2Type:datetime_immutable)\'');
+        $this->addSql('COMMENT ON COLUMN client_order.updated_at IS \'(DC2Type:datetime_immutable)\'');
+        $this->addSql('COMMENT ON COLUMN client_order.client_order_date IS \'(DC2Type:datetime_immutable)\'');
+        $this->addSql('COMMENT ON COLUMN client_order.expected_delivery_date IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('CREATE TABLE company (id INT NOT NULL, name VARCHAR(100) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, contact_email VARCHAR(50) NOT NULL, contact_phone VARCHAR(50) DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_4FBF094FCAB86C7B ON company (contact_email)');
         $this->addSql('COMMENT ON COLUMN company.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN company.updated_at IS \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('CREATE TABLE customer_order (id INT NOT NULL, company_id INT NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, customer_name VARCHAR(100) NOT NULL, order_date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, expected_delivery_date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, status VARCHAR(50) NOT NULL, PRIMARY KEY(id))');
-        $this->addSql('CREATE INDEX IDX_3B1CE6A3979B1AD6 ON customer_order (company_id)');
-        $this->addSql('COMMENT ON COLUMN customer_order.created_at IS \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('COMMENT ON COLUMN customer_order.updated_at IS \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('COMMENT ON COLUMN customer_order.order_date IS \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('COMMENT ON COLUMN customer_order.expected_delivery_date IS \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('CREATE TABLE delivery (id INT NOT NULL, tour_id INT DEFAULT NULL, company_id INT NOT NULL, customer_order_id INT NOT NULL, geocoded_address_id INT NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, status VARCHAR(50) NOT NULL, expected_delivery_date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, actual_delivery_date TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE delivery (id INT NOT NULL, tour_id INT DEFAULT NULL, company_id INT NOT NULL, client_order_id INT NOT NULL, geocoded_address_id INT NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, status VARCHAR(50) NOT NULL, expected_delivery_date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, actual_delivery_date TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_3781EC1015ED8D43 ON delivery (tour_id)');
         $this->addSql('CREATE INDEX IDX_3781EC10979B1AD6 ON delivery (company_id)');
-        $this->addSql('CREATE INDEX IDX_3781EC10A15A2E17 ON delivery (customer_order_id)');
+        $this->addSql('CREATE INDEX IDX_3781EC10A3795DFD ON delivery (client_order_id)');
         $this->addSql('CREATE INDEX IDX_3781EC101B517A96 ON delivery (geocoded_address_id)');
         $this->addSql('COMMENT ON COLUMN delivery.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN delivery.updated_at IS \'(DC2Type:datetime_immutable)\'');
@@ -103,10 +108,12 @@ final class Version20240922144714 extends AbstractMigration
         $this->addSql('COMMENT ON COLUMN vehicle_availability.end_date IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN vehicle_availability.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN vehicle_availability.updated_at IS \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('ALTER TABLE customer_order ADD CONSTRAINT FK_3B1CE6A3979B1AD6 FOREIGN KEY (company_id) REFERENCES company (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE client ADD CONSTRAINT FK_C7440455979B1AD6 FOREIGN KEY (company_id) REFERENCES company (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE client_order ADD CONSTRAINT FK_56440F2F979B1AD6 FOREIGN KEY (company_id) REFERENCES company (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE client_order ADD CONSTRAINT FK_56440F2F19EB6921 FOREIGN KEY (client_id) REFERENCES client (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE delivery ADD CONSTRAINT FK_3781EC1015ED8D43 FOREIGN KEY (tour_id) REFERENCES tour (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE delivery ADD CONSTRAINT FK_3781EC10979B1AD6 FOREIGN KEY (company_id) REFERENCES company (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('ALTER TABLE delivery ADD CONSTRAINT FK_3781EC10A15A2E17 FOREIGN KEY (customer_order_id) REFERENCES customer_order (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE delivery ADD CONSTRAINT FK_3781EC10A3795DFD FOREIGN KEY (client_order_id) REFERENCES client_order (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE delivery ADD CONSTRAINT FK_3781EC101B517A96 FOREIGN KEY (geocoded_address_id) REFERENCES geocoded_address (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE delivery_product ADD CONSTRAINT FK_D954BB734584665A FOREIGN KEY (product_id) REFERENCES product (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE delivery_product ADD CONSTRAINT FK_D954BB7312136921 FOREIGN KEY (delivery_id) REFERENCES delivery (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
@@ -127,8 +134,9 @@ final class Version20240922144714 extends AbstractMigration
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE SCHEMA public');
+        $this->addSql('DROP SEQUENCE client_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE client_order_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE company_id_seq CASCADE');
-        $this->addSql('DROP SEQUENCE customer_order_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE delivery_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE delivery_product_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE driver_id_seq CASCADE');
@@ -141,10 +149,12 @@ final class Version20240922144714 extends AbstractMigration
         $this->addSql('DROP SEQUENCE "user_id_seq" CASCADE');
         $this->addSql('DROP SEQUENCE vehicle_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE vehicle_availability_id_seq CASCADE');
-        $this->addSql('ALTER TABLE customer_order DROP CONSTRAINT FK_3B1CE6A3979B1AD6');
+        $this->addSql('ALTER TABLE client DROP CONSTRAINT FK_C7440455979B1AD6');
+        $this->addSql('ALTER TABLE client_order DROP CONSTRAINT FK_56440F2F979B1AD6');
+        $this->addSql('ALTER TABLE client_order DROP CONSTRAINT FK_56440F2F19EB6921');
         $this->addSql('ALTER TABLE delivery DROP CONSTRAINT FK_3781EC1015ED8D43');
         $this->addSql('ALTER TABLE delivery DROP CONSTRAINT FK_3781EC10979B1AD6');
-        $this->addSql('ALTER TABLE delivery DROP CONSTRAINT FK_3781EC10A15A2E17');
+        $this->addSql('ALTER TABLE delivery DROP CONSTRAINT FK_3781EC10A3795DFD');
         $this->addSql('ALTER TABLE delivery DROP CONSTRAINT FK_3781EC101B517A96');
         $this->addSql('ALTER TABLE delivery_product DROP CONSTRAINT FK_D954BB734584665A');
         $this->addSql('ALTER TABLE delivery_product DROP CONSTRAINT FK_D954BB7312136921');
@@ -159,8 +169,9 @@ final class Version20240922144714 extends AbstractMigration
         $this->addSql('ALTER TABLE "user" DROP CONSTRAINT FK_8D93D649979B1AD6');
         $this->addSql('ALTER TABLE vehicle DROP CONSTRAINT FK_1B80E486979B1AD6');
         $this->addSql('ALTER TABLE vehicle_availability DROP CONSTRAINT FK_865F4DCB545317D1');
+        $this->addSql('DROP TABLE client');
+        $this->addSql('DROP TABLE client_order');
         $this->addSql('DROP TABLE company');
-        $this->addSql('DROP TABLE customer_order');
         $this->addSql('DROP TABLE delivery');
         $this->addSql('DROP TABLE delivery_product');
         $this->addSql('DROP TABLE driver');

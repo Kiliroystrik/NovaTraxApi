@@ -2,9 +2,8 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Client;
 use App\Entity\Company;
-use App\Entity\CustomerOrder;
-use App\Entity\Delivery;
 use App\Service\PasswordHashService;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -12,7 +11,7 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory as FakerFactory;
 
-class CustomerOrderFixtures extends Fixture implements DependentFixtureInterface
+class ClientFixtures extends Fixture implements DependentFixtureInterface
 {
     public function __construct(private PasswordHashService $passwordHashService) {}
 
@@ -20,25 +19,20 @@ class CustomerOrderFixtures extends Fixture implements DependentFixtureInterface
     {
         $faker = FakerFactory::create('fr_FR');
 
-        $statuses = ['pending', 'delivered', 'cancelled'];
-
         // Me permet de ne pas avoir de doublon
         $breaker = 0;
 
         for ($i = 0; $i < 10; $i++) {
             $randomCompany = $this->getReference('company-' . $i, Company::class); // Récupérer chaque entreprise par référence
             for ($j = 0; $j < 10; $j++) {
-                $customerOrder = new CustomerOrder();
-                $customerOrder->setCompany($randomCompany);
-                $customerOrder->setCustomerName($faker->name);
-                $customerOrder->setOrderDate(DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-1 year', '+1 year')));
-                $orderDateToString = $customerOrder->getOrderDate()->format('Y-m-d');
-                $customerOrder->setExpectedDeliveryDate(DateTimeImmutable::createFromMutable($faker->dateTimeBetween($orderDateToString, '+1 year')));
-                $customerOrder->setStatus($faker->randomElement($statuses));
+                $client = new Client();
+                $client->setCompany($randomCompany);
+                $client->setName($faker->company());
 
-                $manager->persist($customerOrder);
 
-                $this->addReference('customer-order-' . $breaker, $customerOrder);
+                $manager->persist($client);
+
+                $this->addReference('client-' . $breaker, $client);
 
                 $breaker++;
             }
