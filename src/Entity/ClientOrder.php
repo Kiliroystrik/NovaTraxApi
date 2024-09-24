@@ -31,7 +31,7 @@ class ClientOrder
 
     #[ORM\Column]
     #[Groups(['clientOrder:list', 'clientOrder:read', 'delivery:read', 'delivery:write'])]
-    private ?\DateTimeImmutable $clientOrderDate = null;
+    private ?\DateTimeImmutable $orderDate = null;
 
     #[ORM\Column]
     #[Groups(['clientOrder:list', 'clientOrder:read', 'delivery:read', 'delivery:write'])]
@@ -55,6 +55,7 @@ class ClientOrder
 
     #[ORM\ManyToOne(inversedBy: 'clientOrders')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["clientOrder:list"])]
     private ?Client $client = null;
 
     public function __construct()
@@ -104,14 +105,14 @@ class ClientOrder
         return $this;
     }
 
-    public function getClientOrderDate(): ?\DateTimeImmutable
+    public function getOrderDate(): ?\DateTimeImmutable
     {
-        return $this->clientOrderDate;
+        return $this->orderDate;
     }
 
-    public function setClientOrderDate(\DateTimeImmutable $clientOrderDate): static
+    public function setOrderDate(\DateTimeImmutable $clientOrderDate): static
     {
-        $this->clientOrderDate = $clientOrderDate;
+        $this->orderDate = $clientOrderDate;
 
         return $this;
     }

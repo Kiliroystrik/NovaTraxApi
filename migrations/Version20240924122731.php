@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20240923191643 extends AbstractMigration
+final class Version20240924122731 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -37,13 +37,13 @@ final class Version20240923191643 extends AbstractMigration
         $this->addSql('CREATE SEQUENCE vehicle_availability_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE TABLE client (id INT NOT NULL, company_id INT NOT NULL, name VARCHAR(100) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_C7440455979B1AD6 ON client (company_id)');
-        $this->addSql('CREATE TABLE client_order (id INT NOT NULL, company_id INT NOT NULL, client_id INT NOT NULL, order_number VARCHAR(20) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, client_order_date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, expected_delivery_date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, status VARCHAR(50) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE client_order (id INT NOT NULL, company_id INT NOT NULL, client_id INT NOT NULL, order_number VARCHAR(20) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, order_date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, expected_delivery_date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, status VARCHAR(50) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_56440F2F551F0F81 ON client_order (order_number)');
         $this->addSql('CREATE INDEX IDX_56440F2F979B1AD6 ON client_order (company_id)');
         $this->addSql('CREATE INDEX IDX_56440F2F19EB6921 ON client_order (client_id)');
         $this->addSql('COMMENT ON COLUMN client_order.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN client_order.updated_at IS \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('COMMENT ON COLUMN client_order.client_order_date IS \'(DC2Type:datetime_immutable)\'');
+        $this->addSql('COMMENT ON COLUMN client_order.order_date IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN client_order.expected_delivery_date IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('CREATE TABLE company (id INT NOT NULL, name VARCHAR(100) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, contact_email VARCHAR(50) NOT NULL, contact_phone VARCHAR(50) DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_4FBF094FCAB86C7B ON company (contact_email)');

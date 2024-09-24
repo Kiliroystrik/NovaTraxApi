@@ -49,7 +49,7 @@ class ClientOrderFixtures extends Fixture implements DependentFixtureInterface
 
                 // Date de commande
                 $clientOrderDate = DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-1 year', '+1 year'));
-                $clientOrder->setClientOrderDate($clientOrderDate);
+                $clientOrder->setOrderDate($clientOrderDate);
 
                 // Date de livraison prévue (entre la date de commande et +1 an)
                 $clientOrder->setExpectedDeliveryDate(DateTimeImmutable::createFromMutable($faker->dateTimeBetween($clientOrderDate->format('Y-m-d'), '+1 year')));
