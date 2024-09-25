@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: GeocodedAddressRepository::class)]
 class GeocodedAddress
@@ -14,45 +15,59 @@ class GeocodedAddress
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?string $streetName = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?string $fullAddress = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?string $city = null;
 
     #[ORM\Column(length: 20)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?string $postalCode = null;
 
     #[ORM\Column(length: 10, nullable: true)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?string $department = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?string $country = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 8, nullable: true)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?string $latitude = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 11, scale: 8, nullable: true)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?string $longitude = null;
 
     #[ORM\Column(length: 10)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?string $streetNumber = null;
 
     #[ORM\Column]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?bool $isVerified = null;
 
     #[ORM\Column(length: 20)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?string $source = null;
 
     /**

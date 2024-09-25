@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: DeliveryRepository::class)]
 class Delivery
@@ -14,21 +15,27 @@ class Delivery
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?string $status = null;
 
     #[ORM\Column]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?\DateTimeImmutable $expectedDeliveryDate = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?\DateTimeImmutable $actualDeliveryDate = null;
 
     #[ORM\ManyToOne(inversedBy: 'deliveries')]
@@ -42,6 +49,7 @@ class Delivery
      * @var Collection<int, DeliveryProduct>
      */
     #[ORM\OneToMany(targetEntity: DeliveryProduct::class, mappedBy: 'delivery', orphanRemoval: true)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private Collection $productDeliveries;
 
     #[ORM\ManyToOne(inversedBy: 'deliveries')]
@@ -50,6 +58,7 @@ class Delivery
 
     #[ORM\ManyToOne(inversedBy: 'deliveries')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?GeocodedAddress $geocodedAddress = null;
 
     public function __construct()

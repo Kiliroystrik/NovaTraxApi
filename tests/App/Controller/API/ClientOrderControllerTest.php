@@ -112,6 +112,33 @@ class ClientOrderControllerTest extends WebTestCase
         // }
     }
 
+    public function testGetClientOrder(): void
+    {
+        // Authentification
+        $client = $this->createAuthenticatedClient();
+
+        // Récupérer une commande de mon utilisateur
+        $clientOrderRepository = $this->entityManager->getRepository(ClientOrder::class);
+        $clientOrder = $clientOrderRepository->findAll()[0];
+
+        // Envoyer une requête GET à l'API pour récupérer la commande
+        $client->request('GET', "/api/client/orders/{$clientOrder->getId()}");
+
+        // Vérifier que la réponse HTTP est bien 200 OK
+        $this->assertResponseStatusCodeSame(200);
+
+        // Vérifier que le contenu de la réponse est du JSON
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        // Extraire le contenu JSON de la réponse
+        $responseContent = $client->getResponse()->getContent();
+        $data = json_decode($responseContent, true);
+
+        // Vérifier que la réponse contient les informations de la commande
+        $this->assertArrayHasKey('id', $data);
+        $this->assertArrayHasKey('orderNumber', $data);
+    }
+
     // public function getCompany(): void
     // {
     //     $client = $this->createAuthenticatedClient();

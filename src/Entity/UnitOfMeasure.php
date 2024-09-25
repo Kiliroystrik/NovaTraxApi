@@ -6,6 +6,7 @@ use App\Repository\UnitOfMeasureRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: UnitOfMeasureRepository::class)]
 class UnitOfMeasure
@@ -13,15 +14,19 @@ class UnitOfMeasure
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?string $name = null;
 
     /**
