@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\DeliveryProductRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: DeliveryProductRepository::class)]
 class DeliveryProduct
@@ -12,10 +13,12 @@ class DeliveryProduct
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'productDeliveries')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?Product $product = null;
 
     #[ORM\ManyToOne(inversedBy: 'productDeliveries')]
@@ -23,6 +26,7 @@ class DeliveryProduct
     private ?Delivery $delivery = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 14, scale: 3)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?string $quantity = null;
 
     public function getId(): ?int

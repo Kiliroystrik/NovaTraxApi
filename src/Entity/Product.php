@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
@@ -14,18 +15,23 @@ class Product
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 100)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?string $description = null;
 
     /**
@@ -40,6 +46,7 @@ class Product
 
     #[ORM\ManyToOne(inversedBy: 'products')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?UnitOfMeasure $unitOfMeasure = null;
 
     public function __construct()

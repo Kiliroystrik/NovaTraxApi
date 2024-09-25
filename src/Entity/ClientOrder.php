@@ -50,12 +50,12 @@ class ClientOrder
 
     #[ORM\ManyToOne(inversedBy: 'clientOrders')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['clientOrder:read', 'delivery:read', 'delivery:write'])]
+    #[Groups(['delivery:read', 'delivery:write'])]
     private ?Company $company = null;
 
     #[ORM\ManyToOne(inversedBy: 'clientOrders')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(["clientOrder:list"])]
+    #[Groups(['clientOrder:read', "clientOrder:list"])]
     private ?Client $client = null;
 
     public function __construct()

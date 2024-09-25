@@ -36,6 +36,17 @@ class ClientOrderController extends AbstractController
         ], 200, [], ['groups' => ['clientOrder:list']]);
     }
 
+    #[Route("/api/client/orders/{id}", methods: ["GET"])]
+    public function getClientOrder(ClientOrderRepository $clientOrderRepository, int $id): JsonResponse
+    {
+        $clientOrder = $clientOrderRepository->find($id);
+        if (!$clientOrder) {
+            return new JsonResponse(['error' => 'Order not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        return $this->json($clientOrder, 200, [], ['groups' => ['clientOrder:read']]);
+    }
+
 
     #[Route("/api/clientOrder", methods: ["PATCH"])]
     public function updateUserClientOrder(Request $request, ClientOrderRepository $clientOrderRepository, UserRepository $userRepository): JsonResponse
