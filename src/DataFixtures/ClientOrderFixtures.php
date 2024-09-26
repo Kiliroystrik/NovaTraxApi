@@ -47,12 +47,8 @@ class ClientOrderFixtures extends Fixture implements DependentFixtureInterface
                 $clientOrderNumber = $this->clientOrderNumberGenerator->generate();
                 $clientOrder->setOrderNumber($clientOrderNumber);
 
-                // Date de commande
-                $clientOrderDate = DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-1 year', '+1 year'));
-                $clientOrder->setOrderDate($clientOrderDate);
-
-                // Date de livraison prévue (entre la date de commande et +1 an)
-                $clientOrder->setExpectedDeliveryDate(DateTimeImmutable::createFromMutable($faker->dateTimeBetween($clientOrderDate->format('Y-m-d'), '+1 year')));
+                // Date de livraison prévue
+                $clientOrder->setExpectedDeliveryDate(DateTimeImmutable::createFromMutable($faker->dateTimeThisYear()));
 
                 // Statut de la commande
                 $clientOrder->setStatus($faker->randomElement($statuses));

@@ -22,19 +22,15 @@ class ClientOrder
     private ?string $orderNumber = null;
 
     #[ORM\Column]
-    #[Groups(['clientOrder:list', 'clientOrder:read', 'delivery:read', 'delivery:write'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'delivery:write'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['clientOrder:list', 'clientOrder:read', 'delivery:read', 'delivery:write'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\Column]
-    #[Groups(['clientOrder:list', 'clientOrder:read', 'delivery:read', 'delivery:write'])]
-    private ?\DateTimeImmutable $orderDate = null;
-
-    #[ORM\Column]
-    #[Groups(['clientOrder:list', 'clientOrder:read', 'delivery:read', 'delivery:write'])]
+    #[ORM\Column(nullable: true)]
+    #[Groups(['clientOrder:write', 'clientOrder:list', 'clientOrder:read', 'delivery:read', 'delivery:write'])]
     private ?\DateTimeImmutable $expectedDeliveryDate = null;
 
     #[ORM\Column(length: 50)]
@@ -50,18 +46,19 @@ class ClientOrder
 
     #[ORM\ManyToOne(inversedBy: 'clientOrders')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['delivery:read', 'delivery:write'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'delivery:write'])]
     private ?Company $company = null;
 
     #[ORM\ManyToOne(inversedBy: 'clientOrders')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['clientOrder:read', "clientOrder:list"])]
+    #[Groups(['clientOrder:write', 'clientOrder:read', "clientOrder:list"])]
     private ?Client $client = null;
 
     public function __construct()
     {
         $this->deliveries = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
+        $this->status = 'pending';
     }
 
     public function getId(): ?int
@@ -101,18 +98,6 @@ class ClientOrder
     public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    public function getOrderDate(): ?\DateTimeImmutable
-    {
-        return $this->orderDate;
-    }
-
-    public function setOrderDate(\DateTimeImmutable $clientOrderDate): static
-    {
-        $this->orderDate = $clientOrderDate;
 
         return $this;
     }

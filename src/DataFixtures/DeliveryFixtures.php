@@ -32,7 +32,7 @@ class DeliveryFixtures extends Fixture implements DependentFixtureInterface
                 $delivery = new Delivery();
                 $delivery->setClientOrder($randomClientOrder);
                 $delivery->setCompany($randomClientOrder->getCompany());
-                $clientOrderDate = $randomClientOrder->getOrderDate()->format('Y-m-d');
+                $clientOrderDate = $randomClientOrder->getExpectedDeliveryDate()->format('Y-m-d');
                 $expectedDeliveryDate = DateTimeImmutable::createFromMutable($faker->dateTimeBetween($clientOrderDate, '+1 year'));
                 $delivery->setExpectedDeliveryDate($expectedDeliveryDate);
                 $expectedDeliveryDateToString = $expectedDeliveryDate->format('Y-m-d');

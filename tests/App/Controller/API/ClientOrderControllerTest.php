@@ -6,6 +6,7 @@ use App\DataFixtures\ClientFixtures;
 use App\DataFixtures\ClientOrderFixtures;
 use App\DataFixtures\CompanyFixtures;
 use App\DataFixtures\UserFixtures;
+use App\Entity\Client;
 use App\Entity\ClientOrder;
 use App\Entity\Company;
 use App\Entity\User;
@@ -138,6 +139,60 @@ class ClientOrderControllerTest extends WebTestCase
         $this->assertArrayHasKey('id', $data);
         $this->assertArrayHasKey('orderNumber', $data);
     }
+
+    public function testCreateClientOrder(): void
+    {
+        // Authentification avec un utilisateur spécifique
+        $client = $this->createAuthenticatedClient("admin@gmail.com", "password");
+
+        // Récupérer un utilisateur pour vérifier l'association avec la commande
+        $userRepository = $this->entityManager->getRepository(User::class);
+        $user = $userRepository->findOneBy(['email' => 'admin@gmail.com']);
+
+        // Récupérer un client pour l'associer à la commande (relation ManyToOne)
+        $clientRepository = $this->entityManager->getRepository(Client::class);
+        $clientEntity = $clientRepository->findOneBy([]);
+
+        // Récupérer la compagnie de l'utilisateur
+        $userCompany = $user->getCompany();
+
+        // Envoyer une requête POST à l'API pour ajouter une commande
+        $client->request(
+            'POST',
+            '/api/client/orders',
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            json_encode([
+                'expectedDeliveryDate' => '2024-01-01',
+                'status' => 'pending',
+                'client' => $clientEntity->getId(), // On passe l'ID du client
+            ])
+        );
+
+        // Vérifier que la requête HTTP est bien 201 Created
+        $this->assertResponseStatusCodeSame(201);
+
+        // Vérifier que le contenu de la réponse est du JSON
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
+
+        // Extraire le contenu JSON de la requête
+        $responseContent = $client->getResponse()->getContent();
+        $data = json_decode($responseContent, true);
+
+        // Vérifier que la réponse contient les informations de la commande
+        $this->assertArrayHasKey('id', $data);
+        $this->assertArrayHasKey('orderNumber', $data); // Vérifier que l'orderNumber est généré
+        $this->assertArrayHasKey('company', $data);
+        $this->assertArrayHasKey('client', $data);
+
+        // Vérifier que la commande est associée à la compagnie de l'utilisateur
+        $this->assertSame($userCompany->getName(), $data['company']['name']);
+
+        // Vérifier que la commande est associée au bon client
+        $this->assertSame($clientEntity->getId(), $data['client']['id']);
+    }
+
 
     // public function getCompany(): void
     // {
