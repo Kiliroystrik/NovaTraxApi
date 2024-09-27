@@ -14,11 +14,11 @@ class Client
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["clientOrder:read", "clientOrder:list", "clientOrder:read"])]
+    #[Groups(["clientOrder:read", "clientOrder:list", "clientOrder:read", "client:list"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(["clientOrder:read", "clientOrder:list", "clientOrder:read"])]
+    #[Groups(["clientOrder:read", "clientOrder:list", "clientOrder:read", "client:list"])]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'clients')]

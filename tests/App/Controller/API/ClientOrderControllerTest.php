@@ -165,7 +165,6 @@ class ClientOrderControllerTest extends WebTestCase
             ['CONTENT_TYPE' => 'application/json'],
             json_encode([
                 'expectedDeliveryDate' => '2024-01-01',
-                'status' => 'pending',
                 'client' => $clientEntity->getId(), // On passe l'ID du client
             ])
         );
