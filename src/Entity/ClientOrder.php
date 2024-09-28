@@ -107,7 +107,7 @@ class ClientOrder
         return $this->expectedDeliveryDate;
     }
 
-    public function setExpectedDeliveryDate(\DateTimeImmutable $expectedDeliveryDate): static
+    public function setExpectedDeliveryDate(?\DateTimeImmutable $expectedDeliveryDate): static
     {
         $this->expectedDeliveryDate = $expectedDeliveryDate;
 
