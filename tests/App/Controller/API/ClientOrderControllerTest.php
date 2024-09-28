@@ -73,7 +73,7 @@ class ClientOrderControllerTest extends WebTestCase
         $this->createAuthenticatedClient();
 
         // Envoyer une requête GET à l'API pour récupérer les entreprises
-        $this->client->request('GET', '/api/client/orders');
+        $this->client->request('GET', '/api/orders');
 
         // Vérifier que la réponse HTTP est bien 200 OK
         $this->assertResponseStatusCodeSame(200);
@@ -123,7 +123,7 @@ class ClientOrderControllerTest extends WebTestCase
         $clientOrder = $clientOrderRepository->findAll()[0];
 
         // Envoyer une requête GET à l'API pour récupérer la commande
-        $client->request('GET', "/api/client/orders/{$clientOrder->getId()}");
+        $client->request('GET', "/api/orders/{$clientOrder->getId()}");
 
         // Vérifier que la réponse HTTP est bien 200 OK
         $this->assertResponseStatusCodeSame(200);
@@ -159,7 +159,7 @@ class ClientOrderControllerTest extends WebTestCase
         // Envoyer une requête POST à l'API pour ajouter une commande
         $client->request(
             'POST',
-            '/api/client/orders',
+            '/api/orders',
             [],
             [],
             ['CONTENT_TYPE' => 'application/json'],
@@ -193,73 +193,68 @@ class ClientOrderControllerTest extends WebTestCase
     }
 
 
-    // public function getCompany(): void
-    // {
-    //     $client = $this->createAuthenticatedClient();
+    public function testUpdateClientOrder(): void
+    {
+        // Authentification
+        $client = $this->createAuthenticatedClient("admin@gmail.com", "password");
 
-    //     $user = "superadmin@gmail.com";
+        // Récupérer une commande de mon utilisateur
+        $clientOrderRepository = $this->entityManager->getRepository(ClientOrder::class);
+        $clientOrder = $clientOrderRepository->findAll()[0];
 
-    //     $repository = $this->entityManager->getRepository(User::class);
+        // Envoyer une requête PUT ou PATCH à l'API pour mettre à jour la commande
+        $client->request(
+            'PATCH',
+            "/api/orders/{$clientOrder->getId()}",
+            [],
+            [],
+            ['CONTENT_TYPE' => 'application/json'],
+            json_encode([
+                'expectedDeliveryDate' => '2024-01-01',
+            ])
+        );
 
-    //     $user = $repository->findOneBy(['email' => $user]);
+        // Vérifier que la requête HTTP est bien 200 OK
+        $this->assertResponseStatusCodeSame(200);
 
-    //     // Vérifier que l'utilisateur est bien récupéré et associé à une entreprise
-    //     $this->assertNotNull($user, 'L\'utilisateur n\'a pas été trouvé en base de données.');
-    //     $userCompany = $user->getCompany();
-    //     $this->assertNotNull($userCompany, 'L\'utilisateur n\'est pas associé à une entreprise.');
+        // Vérifier que le contenu de la requête est du JSON
+        $this->assertResponseHeaderSame('Content-Type', 'application/json');
 
-    //     // Envoyer une requête GET à l'API pour récupérer l'entreprise de l'utilisateur
-    //     $client->request('GET', '/api/company');
+        // Extraire le contenu JSON de la requête
+        $responseContent = $client->getResponse()->getContent();
+        $data = json_decode($responseContent, true);
 
-    //     // Vérifier que la réponse HTTP est bien 200 OK
-    //     $this->assertResponseStatusCodeSame(200);
+        // Vérifier que la commande est mise à jour
+        // Je passe ma date en datetimeimmutable pour la comparer à l'objet de la requête
+        $expectedDeliveryDate = new \DateTimeImmutable('2024-01-01');
+        $dataExpectedDeliveryDate = new \DateTimeImmutable($data['expectedDeliveryDate']);
+        $this->assertEquals($expectedDeliveryDate, $dataExpectedDeliveryDate);
+    }
 
-    //     // Extraire la réponse JSON
-    //     $responseContent = $client->getResponse()->getContent();
-    //     $data = json_decode($responseContent, true);
 
-    //     // Vérifier que l'API renvoie bien l'entreprise associée à l'utilisateur
-    //     $this->assertSame($userCompany->getName(), $data['name'], 'Le nom de l\'entreprise ne correspond pas.');
-    //     $this->assertSame($userCompany->getContactEmail(), $data['contactEmail'], 'L\'email de contact de l\'entreprise ne correspond pas.');
-    // }
+    public function testDeleteClientOrder(): void
+    {
+        // Authentification
+        $client = $this->createAuthenticatedClient("admin@gmail.com", "password");
 
-    // public function testUpdateCompany(): void
-    // {
-    //     $client = $this->createAuthenticatedClient();
+        // Récupérer une commande de mon utilisateur
+        $clientOrderRepository = $this->entityManager->getRepository(ClientOrder::class);
+        $clientOrder = $clientOrderRepository->findAll()[0];
 
-    //     // Récupérer l'utilisateur actuel
-    //     $userRepository = $this->entityManager->getRepository(User::class);
-    //     $user = $userRepository->findOneBy(['email' => 'superadmin@gmail.com']);
+        // Envoyer une requête DELETE à l'API pour supprimer la commande
+        $client->request(
+            'DELETE',
+            "/api/orders/{$clientOrder->getId()}"
+        );
 
-    //     // Vérifier que l'utilisateur et la compagnie associée existent
-    //     $this->assertNotNull($user, 'L\'utilisateur n\'a pas été trouvé en base de données.');
-    //     $userCompany = $user->getCompany();
-    //     $this->assertNotNull($userCompany, 'L\'utilisateur n\'est pas associé à une entreprise.');
+        // Vérifier que la requête HTTP est bien 204 No Content
+        $this->assertResponseStatusCodeSame(204);
 
-    //     // Données à mettre à jour via PATCH
-    //     $updatedData = [
-    //         'contactEmail' => 'new-email@example.com',
-    //         'contactPhone' => '987-654-3210'
-    //     ];
-
-    //     // Envoyer une requête PATCH à l'API pour mettre à jour l'entreprise de l'utilisateur
-    //     $client->request(
-    //         'PATCH',
-    //         '/api/company',
-    //         [],
-    //         [],
-    //         ['CONTENT_TYPE' => 'application/json'],
-    //         json_encode($updatedData)
-    //     );
-
-    //     // Vérifier que la réponse HTTP est bien 200 OK
-    //     $this->assertResponseStatusCodeSame(204);
-
-    //     // Vérifier que la mise à jour est bien reflétée en base de données
-    //     $updatedCompany = $userRepository->findOneBy(['email' => 'superadmin@gmail.com'])->getCompany();
-    //     $this->assertSame('new-email@example.com', $updatedCompany->getContactEmail(), 'L\'email de contact de l\'entreprise n\'a pas été mis à jour en base de données.');
-    //     $this->assertSame('987-654-3210', $updatedCompany->getContactPhone(), 'Le numéro de téléphone de l\'entreprise n\'a pas été mis à jour en base de données.');
-    // }
+        // Vérifier que la commande est supprimée
+        $clientOrderRepository = $this->entityManager->getRepository(ClientOrder::class);
+        $clientOrder = $clientOrderRepository->find($clientOrder->getId());
+        $this->assertNull($clientOrder);
+    }
 
     protected function tearDown(): void
     {

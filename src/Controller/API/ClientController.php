@@ -2,10 +2,9 @@
 
 namespace App\Controller\API;
 
-use App\Entity\ClientOrder;
+use App\Entity\Client;
 use App\Repository\ClientRepository;
 use App\Repository\UserRepository;
-use App\Service\ClientOrderNumberGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
@@ -14,9 +13,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Role\Role;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ClientController extends AbstractController
 {
@@ -63,7 +59,7 @@ class ClientController extends AbstractController
         return $this->json($clientOrder, 200, [], ['groups' => ['client:read']]);
     }
 
-    #[Route("/api/client/orders", methods: ["POST"])]
+    #[Route("/api/clients", methods: ["POST"])]
     public function createClientOrder(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         try {
@@ -103,7 +99,7 @@ class ClientController extends AbstractController
 
 
 
-    #[Route("/api/clientOrder", methods: ["PATCH"])]
+    #[Route("/api/clients", methods: ["PATCH"])]
     public function updateUserClientOrder(Request $request, ClientRepository $clientRepository, UserRepository $userRepository): JsonResponse
     {
         try {
