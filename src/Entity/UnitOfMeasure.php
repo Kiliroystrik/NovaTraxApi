@@ -14,20 +14,24 @@ class UnitOfMeasure
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'unitOfMeasure:read', 'unitOfMeasure:list'])]
     private ?int $id = null;
 
     #[ORM\Column]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'unitOfMeasure:read', 'unitOfMeasure:list'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'unitOfMeasure:read', 'unitOfMeasure:list'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\Column(length: 50)]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[ORM\Column(length: 50, unique: true)]
+    #[Groups(['clientOrder:read', 'delivery:read', 'unitOfMeasure:read', 'unitOfMeasure:list'])]
     private ?string $name = null;
+
+    #[ORM\Column(length: 10)]
+    #[Groups(['clientOrder:read', 'delivery:read', 'unitOfMeasure:read', 'unitOfMeasure:list'])]
+    private ?string $symbol = null;
 
     /**
      * @var Collection<int, Product>
@@ -108,6 +112,18 @@ class UnitOfMeasure
                 $product->setUnitOfMeasure(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSymbol(): ?string
+    {
+        return $this->symbol;
+    }
+
+    public function setSymbol(string $symbol): static
+    {
+        $this->symbol = $symbol;
 
         return $this;
     }
