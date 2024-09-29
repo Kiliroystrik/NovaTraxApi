@@ -15,23 +15,23 @@ class Product
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'product:read', 'product:list'])]
     private ?int $id = null;
 
     #[ORM\Column]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'product:read', 'product:list'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'product:read', 'product:list'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'product:read', 'product:list'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'product:read', 'product:list'])]
     private ?string $description = null;
 
     /**
@@ -42,11 +42,12 @@ class Product
 
     #[ORM\ManyToOne(inversedBy: 'products')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['product:read', 'product:list'])]
     private ?Company $company = null;
 
     #[ORM\ManyToOne(inversedBy: 'products')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'product:read', 'product:list'])]
     private ?UnitOfMeasure $unitOfMeasure = null;
 
     public function __construct()
