@@ -25,7 +25,7 @@ security:
             jwt: ~
             refresh_jwt:
                 check_path: api_refresh_token
-            entry_point: jwt  # Add this line to set the entry point
+            entry_point: jwt
         
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
