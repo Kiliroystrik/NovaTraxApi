@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: VehicleRepository::class)]
 class Vehicle
@@ -14,24 +15,31 @@ class Vehicle
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['vehicle:read', 'vehicle:list'])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(['vehicle:read', 'vehicle:list'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['vehicle:read', 'vehicle:list'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['vehicle:read', 'vehicle:list'])]
     private ?string $licensePlate = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['vehicle:read', 'vehicle:list'])]
     private ?string $type = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['vehicle:read', 'vehicle:list'])]
     private ?string $model = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[Groups(['vehicle:read', 'vehicle:list'])]
     private ?string $capacity = null;
 
     /**
@@ -42,6 +50,7 @@ class Vehicle
 
     #[ORM\ManyToOne(inversedBy: 'vehicles')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['vehicle:read', 'vehicle:list'])]
     private ?Company $company = null;
 
     /**
