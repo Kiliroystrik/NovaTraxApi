@@ -6,6 +6,7 @@ use App\Repository\DriverRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: DriverRepository::class)]
 class Driver
@@ -13,21 +14,27 @@ class Driver
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['driver:read', 'driver:list'])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(['driver:read', 'driver:list'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['driver:read', 'driver:list'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['driver:read', 'driver:list'])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['driver:read', 'driver:list'])]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['driver:read', 'driver:list'])]
     private ?string $licenseNumber = null;
 
     /**
@@ -38,6 +45,7 @@ class Driver
 
     #[ORM\ManyToOne(inversedBy: 'drivers')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['driver:read', 'driver:list'])]
     private ?Company $company = null;
 
     /**
