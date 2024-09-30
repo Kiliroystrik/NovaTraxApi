@@ -15,10 +15,10 @@ class Company
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['clientOrder:read', 'companies:read', 'companies:create', 'driver:read', 'driver:list'])]
+    #[Groups(['clientOrder:read', 'companies:read', 'companies:create', 'driver:read', 'driver:list', 'vehicle:read', 'vehicle:list'])]
     private ?int $id = null;
 
-    #[Groups(['clientOrder:read', 'companies:read', 'companies:create', 'product:read', 'product:list', 'driver:read', 'driver:list'])]
+    #[Groups(['clientOrder:read', 'companies:read', 'companies:create', 'product:read', 'product:list', 'driver:read', 'driver:list', 'vehicle:read', 'vehicle:list'])]
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: "Le nom de l'entreprise ne doit pas être vide.")]
     #[Assert\Length(max: 100, maxMessage: "Le nom de l'entreprise ne peut pas dépasser 100 caractères.")]
