@@ -31,12 +31,12 @@ class ClientOrderFixtures extends Fixture implements DependentFixtureInterface
         for ($i = 0; $i < 10; $i++) {
             // Récupérer chaque entreprise par référence
             /** @var Company $randomCompany */
-            $randomCompany = $this->getReference('company-' . $i);
+            $randomCompany = $this->getReference('company-' . $i, Company::class);
 
             // Pour chaque entreprise, on va associer des commandes à ses clients
             for ($j = 0; $j < 10; $j++) {
                 /** @var Client $client */
-                $client = $this->getReference('client-' . $breaker);
+                $client = $this->getReference('client-' . $breaker, Client::class);
 
                 // Création de la commande
                 $clientOrder = new ClientOrder();

@@ -24,7 +24,7 @@ class ProductFixtures extends Fixture implements DependentFixtureInterface
             $randomCompany = $this->getReference('company-' . $i, Company::class); // Récupérer chaque entreprise par défaut
 
             $product = new Product();
-            $product->setName($faker->word);
+            $product->setName($faker->word());
             $product->setCompany($randomCompany);
             $product->setDescription($faker->realText(200));
             // J'utilise faker pour generer des nombres aleatoires entre 0 et 8 qui correspond au nombre d'unites de mesure disponibles
