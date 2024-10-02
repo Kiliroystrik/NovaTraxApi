@@ -1,0 +1,35 @@
+@startuml
+skinparam linestyle ortho
+
+rectangle "ClientOrder" as CO
+rectangle "Tour" as T
+rectangle "Delivery" as D
+rectangle "StatusManager" as SM
+rectangle "StatusDB" as SDB
+rectangle "Database" as DB
+
+' Gestion des Statuts pour ClientOrder
+CO -right-> SM : 1. setStatus(statusID)
+SM -right-> SDB : 2. getStatus(statusID)
+SDB --> SM : 3. statusDetails
+SM -right-> DB : 4. updateStatus(CO.id, statusDetails)
+DB --> SM : 5. confirmation
+SM --> CO : 6. statusSetSuccessfully
+
+' Gestion des Statuts pour Tour
+T -right-> SM : 1. setStatus(statusID)
+SM -right-> SDB : 2. getStatus(statusID)
+SDB --> SM : 3. statusDetails
+SM -right-> DB : 4. updateStatus(T.id, statusDetails)
+DB --> SM : 5. confirmation
+SM --> T : 6. statusSetSuccessfully
+
+' Gestion des Statuts pour Delivery
+D -right-> SM : 1. setStatus(statusID)
+SM -right-> SDB : 2. getStatus(statusID)
+SDB --> SM : 3. statusDetails
+SM -right-> DB : 4. updateStatus(D.id, statusDetails)
+DB --> SM : 5. confirmation
+SM --> D : 6. statusSetSuccessfully
+
+@enduml
