@@ -1,0 +1,61 @@
+@startuml Sequence Indispo
+skinparam titleBorderRoundCorner 15
+skinparam titleBorderThickness 2
+skinparam titleBorderColor black
+
+title Unavailability Drivers and Vehicles
+
+actor TourManager
+
+participant "TourController" as Controller
+participant "AvailabilityService" as AvailabilityService
+participant "DriverRepository" as DriverRepo
+participant "VehicleRepository" as VehicleRepo
+participant "EntityManager" as EM
+database "Database" as DB
+
+TourManager -> Controller : RequestAvailability(startDate, endDate)
+Controller -> AvailabilityService : getAvailableResources(startDate, endDate)
+AvailabilityService -> DriverRepo : findAvailableDrivers(startDate, endDate)
+DriverRepo -> DB : Query available drivers
+DB --> DriverRepo : List of available drivers
+DriverRepo --> AvailabilityService : List of available drivers
+
+AvailabilityService -> VehicleRepo : findAvailableVehicles(startDate, endDate)
+VehicleRepo -> DB : Query available vehicles
+DB --> VehicleRepo : List of available vehicles
+VehicleRepo --> AvailabilityService : List of available vehicles
+
+AvailabilityService --> Controller : available drivers and vehicles
+Controller --> TourManager : Propose available drivers and vehicles
+
+TourManager -> Controller : SelectDriverAndVehicle(driverId, vehicleId)
+Controller -> AvailabilityService : validateAvailability(driverId, vehicleId, startDate, endDate)
+AvailabilityService -> DriverRepo : isDriverAvailable(driverId, startDate, endDate)
+DriverRepo -> DB : Check driver availability
+DB --> DriverRepo : Availability confirmed (true/false)
+DriverRepo --> AvailabilityService : true/false
+
+alt Driver Available
+    AvailabilityService -> VehicleRepo : isVehicleAvailable(vehicleId, startDate, endDate)
+    VehicleRepo -> DB : Check vehicle availability
+    DB --> VehicleRepo : Availability confirmed (true/false)
+    VehicleRepo --> AvailabilityService : true/false
+
+    alt Vehicle Available
+        AvailabilityService -> EM : persist(Tour)
+        EM -> DB : Insert Tour record
+        DB --> EM : Insert confirmation
+        EM --> AvailabilityService : Tour persisted
+        AvailabilityService --> Controller : Tour assignment successful
+    else Vehicle Unavailable
+        AvailabilityService --> Controller : Error - Vehicle unavailable
+    end
+else Driver Unavailable
+    AvailabilityService --> Controller : Error - Driver unavailable
+end
+
+Controller --> TourManager : Confirmation assignation reussie / Error message
+destroy TourManager
+
+@enduml

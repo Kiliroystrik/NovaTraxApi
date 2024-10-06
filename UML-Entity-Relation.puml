@@ -1,0 +1,244 @@
+@startuml Entity-Relation
+' Définir les entités et leurs attributs
+
+entity "status" as Status {
+  * id : INTEGER <<PK>>
+  --
+  name : VARCHAR(50) <<UNIQUE>>
+}
+
+entity "marque" as Marque {
+  * id : INTEGER <<PK>>
+  --
+  name : VARCHAR(50) <<UNIQUE>>
+}
+
+entity "model" as Model {
+  * id : INTEGER <<PK>>
+  --
+  name : VARCHAR(50)
+  marque_id : INTEGER <<FK>>
+}
+
+entity "vehicle" as Vehicle {
+  * id : INTEGER <<PK>>
+  --
+  license_plate : VARCHAR(50) <<UNIQUE>>
+  model_id : INTEGER <<FK>>
+  capacity : DOUBLE PRECISION
+  company_id : INTEGER <<FK>>
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "reason" as Reason {
+  * id : INTEGER <<PK>>
+  --
+  description : VARCHAR(255) <<UNIQUE>>
+}
+
+entity "unavailability" as Unavailability {
+  * id : INTEGER <<PK>>
+  --
+  driver_id : INTEGER <<FK>>
+  vehicle_id : INTEGER <<FK>>
+  reason_id : INTEGER <<FK>>
+  start_date : TIMESTAMP
+  end_date : TIMESTAMP
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "company" as Company {
+  * id : INTEGER <<PK>>
+  --
+  name : VARCHAR(255)
+  contact_email : VARCHAR(100) <<UNIQUE>>
+  contact_phone : VARCHAR(50)
+  geocoded_address_id : INTEGER <<FK>>
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "user" as User {
+  * id : INTEGER <<PK>>
+  --
+  email : VARCHAR(255) <<UNIQUE>>
+  password : VARCHAR(255)
+  first_name : VARCHAR(50)
+  last_name : VARCHAR(50)
+  role : VARCHAR(50)
+  company_id : INTEGER <<FK>>
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "driver" as Driver {
+  * id : INTEGER <<PK>>
+  --
+  first_name : VARCHAR(50)
+  last_name : VARCHAR(50)
+  license_number : VARCHAR(50)
+  company_id : INTEGER <<FK>>
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "Client" as Client {
+  * id : BIGINT <<PK>>
+  --
+  name : VARCHAR(255)
+}
+
+entity "ClientOrder" as ClientOrder {
+  * id : INTEGER <<PK>>
+  --
+  expected_delivery_date : TIMESTAMP
+  status_id : INTEGER <<FK>>
+  company_id : INTEGER <<FK>>
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+  customer_id : BIGINT <<FK>>
+}
+
+entity "delivery" as Delivery {
+  * id : INTEGER <<PK>>
+  --
+  order_id : INTEGER <<FK>>
+  tour_id : INTEGER <<FK>>
+  status_id : INTEGER <<FK>>
+  geocoded_address_id : INTEGER <<FK>>
+  expected_delivery_date : TIMESTAMP
+  actual_delivery_date : TIMESTAMP
+  company_id : INTEGER <<FK>>
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "product" as Product {
+  * id : INTEGER <<PK>>
+  --
+  name : VARCHAR(100)
+  description : TEXT
+  unit_of_measure_id : INTEGER <<FK>>
+  company_id : INTEGER <<FK>>
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "unit_of_measure" as UnitOfMeasure {
+  * id : INTEGER <<PK>>
+  --
+  name : VARCHAR(50) <<UNIQUE>>
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "delivery_product" as DeliveryProduct {
+  * id : INTEGER <<PK>>
+  --
+  product_id : INTEGER <<FK>>
+  delivery_id : INTEGER <<FK>>
+  quantity : DECIMAL(14, 3)
+}
+
+entity "tour" as Tour {
+  * id : INTEGER <<PK>>
+  --
+  departure_date : TIMESTAMP
+  expected_arrival_date : TIMESTAMP
+  status_id : INTEGER <<FK>>
+  driver_id : INTEGER <<FK>>
+  vehicle_id : INTEGER <<FK>>
+  company_id : INTEGER <<FK>>
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+entity "geocoded_address" as GeocodedAddress {
+  * id : INTEGER <<PK>>
+  --
+  full_address : TEXT
+  street_name : VARCHAR(255)
+  street_number : INTEGER
+  city : VARCHAR(255)
+  postal_code : VARCHAR(20)
+  department : VARCHAR(10)
+  country : VARCHAR(100)
+  latitude : DECIMAL(10, 8)
+  longitude : DECIMAL(11, 8)
+  isVerified : BOOLEAN
+  type : VARCHAR(10)
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
+
+' Définir les relations entre les entités
+
+' Relations pour les statuts
+Status ||--o{ ClientOrder : defines
+Status ||--o{ Tour : defines
+Status ||--o{ Delivery : defines
+
+' Relations pour marque et model
+Marque ||--o{ Model : has
+Model ||--|| Vehicle : uses
+
+' Relations pour vehicle
+Company ||--o{ Vehicle : owns
+Vehicle ||--o{ Unavailability : relates to
+Vehicle ||--o{ Tour : assigned to
+
+' Relations pour reason
+Reason ||--o{ Unavailability : defines
+
+' Relations pour unavailability
+Driver ||--o{ Unavailability : has
+Vehicle ||--o{ Unavailability : has
+
+' Relations pour company
+Company ||--o{ User : employs
+Company ||--o{ Driver : employs
+Company ||--o{ Client : serves
+Company ||--o{ Product : offers
+Company ||--o{ Tour : manages
+Company ||--|| GeocodedAddress : located at
+Company ||--o{ Delivery : handles
+
+' Relations pour user
+User ||--o{ Tour : manages
+
+' Relations pour driver
+Driver ||--o{ Tour : assigned to
+
+' Relations pour Client et ClientOrder
+Client ||--o{ ClientOrder : places
+ClientOrder ||--|| Delivery : leads to
+ClientOrder ||--|| Company : belongs to
+ClientOrder ||--|| Client : customer
+
+' Relations pour Delivery
+Delivery ||--|| GeocodedAddress : located at
+Delivery ||--o{ DeliveryProduct : includes
+Delivery ||--|| Company : belongs to
+Delivery ||--|| Tour : part of
+
+' Relations pour Product
+Product ||--|| Company : belongs to
+Product ||--|| UnitOfMeasure : uses
+Product ||--o{ DeliveryProduct : included in
+
+' Relations pour UnitOfMeasure
+UnitOfMeasure ||--o{ Product : measures
+
+' Relations pour DeliveryProduct
+DeliveryProduct ||--|| Product : refers to
+DeliveryProduct ||--|| Delivery : refers to
+
+' Relations pour Tour
+Tour ||--|| Company : belongs to
+Tour ||--|| Driver : uses
+Tour ||--|| Vehicle : uses
+Tour ||--o{ Delivery : includes
+
+@enduml
