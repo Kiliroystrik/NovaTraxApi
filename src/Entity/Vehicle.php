@@ -10,6 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: VehicleRepository::class)]
+#[ORM\Index(name: 'idx_vehicle_company', columns: ['company_id'])]
+#[ORM\Index(name: 'idx_vehicle_license_plate', columns: ['license_plate'])]
 class Vehicle
 {
     #[ORM\Id]
@@ -42,12 +44,6 @@ class Vehicle
     #[Groups(['vehicle:read', 'vehicle:list'])]
     private ?string $capacity = null;
 
-    /**
-     * @var Collection<int, VehicleAvailability>
-     */
-    #[ORM\OneToMany(targetEntity: VehicleAvailability::class, mappedBy: 'vehicle', orphanRemoval: true)]
-    private Collection $vehicleAvailabilities;
-
     #[ORM\ManyToOne(inversedBy: 'vehicles')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['vehicle:read', 'vehicle:list'])]
@@ -59,11 +55,17 @@ class Vehicle
     #[ORM\OneToMany(targetEntity: Tour::class, mappedBy: 'vehicle')]
     private Collection $tours;
 
+    /**
+     * @var Collection<int, Unavailability>
+     */
+    #[ORM\OneToMany(targetEntity: Unavailability::class, mappedBy: 'vehicle')]
+    private Collection $unavailabilities;
+
     public function __construct()
     {
-        $this->vehicleAvailabilities = new ArrayCollection();
         $this->tours = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
+        $this->unavailabilities = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -143,36 +145,6 @@ class Vehicle
         return $this;
     }
 
-    /**
-     * @return Collection<int, VehicleAvailability>
-     */
-    public function getVehicleAvailabilities(): Collection
-    {
-        return $this->vehicleAvailabilities;
-    }
-
-    public function addVehicleAvailability(VehicleAvailability $vehicleAvailability): static
-    {
-        if (!$this->vehicleAvailabilities->contains($vehicleAvailability)) {
-            $this->vehicleAvailabilities->add($vehicleAvailability);
-            $vehicleAvailability->setVehicle($this);
-        }
-
-        return $this;
-    }
-
-    public function removeVehicleAvailability(VehicleAvailability $vehicleAvailability): static
-    {
-        if ($this->vehicleAvailabilities->removeElement($vehicleAvailability)) {
-            // set the owning side to null (unless already changed)
-            if ($vehicleAvailability->getVehicle() === $this) {
-                $vehicleAvailability->setVehicle(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getCompany(): ?Company
     {
         return $this->company;
@@ -209,6 +181,36 @@ class Vehicle
             // set the owning side to null (unless already changed)
             if ($tour->getVehicle() === $this) {
                 $tour->setVehicle(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Unavailability>
+     */
+    public function getUnavailabilities(): Collection
+    {
+        return $this->unavailabilities;
+    }
+
+    public function addUnavailability(Unavailability $unavailability): static
+    {
+        if (!$this->unavailabilities->contains($unavailability)) {
+            $this->unavailabilities->add($unavailability);
+            $unavailability->setVehicle($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUnavailability(Unavailability $unavailability): static
+    {
+        if ($this->unavailabilities->removeElement($unavailability)) {
+            // set the owning side to null (unless already changed)
+            if ($unavailability->getVehicle() === $this) {
+                $unavailability->setVehicle(null);
             }
         }
 

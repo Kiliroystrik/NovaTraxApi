@@ -2,39 +2,39 @@
 
 namespace App\Repository;
 
-use App\Entity\VehicleAvailability;
+use App\Entity\Reason;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<VehicleAvailability>
+ * @extends ServiceEntityRepository<Reason>
  */
-class VehicleAvailabilityRepository extends ServiceEntityRepository
+class ReasonRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, VehicleAvailability::class);
+        parent::__construct($registry, Reason::class);
     }
 
     //    /**
-    //     * @return VehicleAvailability[] Returns an array of VehicleAvailability objects
+    //     * @return Reason[] Returns an array of Reason objects
     //     */
     //    public function findByExampleField($value): array
     //    {
-    //        return $this->createQueryBuilder('v')
-    //            ->andWhere('v.exampleField = :val')
+    //        return $this->createQueryBuilder('r')
+    //            ->andWhere('r.exampleField = :val')
     //            ->setParameter('val', $value)
-    //            ->clientOrderBy('v.id', 'ASC')
+    //            ->orderBy('r.id', 'ASC')
     //            ->setMaxResults(10)
     //            ->getQuery()
     //            ->getResult()
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?VehicleAvailability
+    //    public function findOneBySomeField($value): ?Reason
     //    {
-    //        return $this->createQueryBuilder('v')
-    //            ->andWhere('v.exampleField = :val')
+    //        return $this->createQueryBuilder('r')
+    //            ->andWhere('r.exampleField = :val')
     //            ->setParameter('val', $value)
     //            ->getQuery()
     //            ->getOneOrNullResult()

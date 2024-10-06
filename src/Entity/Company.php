@@ -100,6 +100,12 @@ class Company
     #[ORM\OneToMany(targetEntity: Client::class, mappedBy: 'company', orphanRemoval: true)]
     private Collection $clients;
 
+    /**
+     * @var Collection<int, Unavailability>
+     */
+    #[ORM\OneToMany(targetEntity: Unavailability::class, mappedBy: 'company', orphanRemoval: true)]
+    private Collection $unavailabilities;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -112,6 +118,7 @@ class Company
         $this->createdAt = new \DateTimeImmutable();
         $this->GeocodedAddresses = new ArrayCollection();
         $this->clients = new ArrayCollection();
+        $this->unavailabilities = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -443,6 +450,36 @@ class Company
             // set the owning side to null (unless already changed)
             if ($client->getCompany() === $this) {
                 $client->setCompany(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Unavailability>
+     */
+    public function getUnavailabilities(): Collection
+    {
+        return $this->unavailabilities;
+    }
+
+    public function addUnavailability(Unavailability $unavailability): static
+    {
+        if (!$this->unavailabilities->contains($unavailability)) {
+            $this->unavailabilities->add($unavailability);
+            $unavailability->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUnavailability(Unavailability $unavailability): static
+    {
+        if ($this->unavailabilities->removeElement($unavailability)) {
+            // set the owning side to null (unless already changed)
+            if ($unavailability->getCompany() === $this) {
+                $unavailability->setCompany(null);
             }
         }
 

@@ -1,0 +1,69 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam classFontSize 12
+skinparam classFontName "Arial"
+
+' Définition des classes
+class Unavailability {
+  - id : int
+  - startDate : DateTimeImmutable
+  - endDate : DateTimeImmutable
+  - createdAt : DateTimeImmutable
+  - updatedAt : DateTimeImmutable
+  + getId() : int
+  + getStartDate() : DateTimeImmutable
+  + setStartDate(startDate : DateTimeImmutable) : void
+  + getEndDate() : DateTimeImmutable
+  + setEndDate(endDate : DateTimeImmutable) : void
+  + getCreatedAt() : DateTimeImmutable
+  + setCreatedAt(createdAt : DateTimeImmutable) : void
+  + getUpdatedAt() : DateTimeImmutable
+  + setUpdatedAt(updatedAt : DateTimeImmutable) : void
+  + getDriver() : Driver
+  + setDriver(driver : Driver) : void
+  + getVehicle() : Vehicle
+  + setVehicle(vehicle : Vehicle) : void
+  + getReason() : Reason
+  + setReason(reason : Reason) : void
+}
+
+class Driver {
+  - id : int
+  - name : string
+  + getId() : int
+  + getName() : string
+  + setName(name : string) : void
+}
+
+class Vehicle {
+  - id : int
+  - licensePlate : string
+  + getId() : int
+  + getLicensePlate() : string
+  + setLicensePlate(licensePlate : string) : void
+}
+
+class Reason {
+  - id : int
+  - name : string
+  - type : string
+  - description : string
+  + getId() : int
+  + getName() : string
+  + setName(name : string) : void
+  + getType() : string
+  + setType(type : string) : void
+  + getDescription() : string
+  + setDescription(description : string) : void
+}
+
+' Définition des relations
+Unavailability --> Driver : driver
+Unavailability --> Vehicle : vehicle
+Unavailability --> Reason : reason
+
+Driver "1" <-- "0..*" Unavailability : unavailabilities
+Vehicle "1" <-- "0..*" Unavailability : unavailabilities
+Reason "1" <-- "0..*" Unavailability : unavailabilities
+
+@enduml

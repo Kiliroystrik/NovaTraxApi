@@ -10,6 +10,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: DeliveryRepository::class)]
+#[ORM\Table(name: 'delivery')]
+#[ORM\Index(name: 'idx_delivery_tour_id', columns: ['tour_id'])]
+#[ORM\Index(name: 'idx_delivery_company_id', columns: ['company_id'])]
+#[ORM\Index(name: 'idx_delivery_status', columns: ['status'])]
+#[ORM\Index(name: 'idx_delivery_expected_delivery_date', columns: ['expected_delivery_date'])]
+#[ORM\Index(name: 'idx_delivery_actual_delivery_date', columns: ['actual_delivery_date'])]
+
 class Delivery
 {
     #[ORM\Id]
