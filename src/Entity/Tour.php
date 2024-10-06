@@ -8,6 +8,13 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TourRepository::class)]
+#[ORM\Index(name: 'idx_tour_status', columns: ['status'])]
+#[ORM\Index(name: 'idx_tour_driver_id', columns: ['driver_id'])]
+#[ORM\Index(name: 'idx_tour_company_id', columns: ['company_id'])]
+#[ORM\Index(name: 'idx_tour_vehicle_id', columns: ['vehicle_id'])]
+#[ORM\Index(name: 'idx_tour_start_date', columns: ['start_date'])]
+#[ORM\Index(name: 'idx_tour_end_date', columns: ['end_date'])]
+
 class Tour
 {
     #[ORM\Id]
@@ -22,10 +29,10 @@ class Tour
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $departureDate = null;
+    private ?\DateTimeImmutable $startDate = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $expectedArrivalDate = null;
+    private ?\DateTimeImmutable $endDate = null;
 
     #[ORM\Column(length: 50)]
     private ?string $status = null;
@@ -80,26 +87,26 @@ class Tour
         return $this;
     }
 
-    public function getDepartureDate(): ?\DateTimeImmutable
+    public function getstartDate(): ?\DateTimeImmutable
     {
-        return $this->departureDate;
+        return $this->startDate;
     }
 
-    public function setDepartureDate(?\DateTimeImmutable $departureDate): static
+    public function setstartDate(?\DateTimeImmutable $startDate): static
     {
-        $this->departureDate = $departureDate;
+        $this->startDate = $startDate;
 
         return $this;
     }
 
-    public function getExpectedArrivalDate(): ?\DateTimeImmutable
+    public function getEndDate(): ?\DateTimeImmutable
     {
-        return $this->expectedArrivalDate;
+        return $this->endDate;
     }
 
-    public function setExpectedArrivalDate(?\DateTimeImmutable $expectedArrivalDate): static
+    public function setEndDate(?\DateTimeImmutable $endDate): static
     {
-        $this->expectedArrivalDate = $expectedArrivalDate;
+        $this->endDate = $endDate;
 
         return $this;
     }

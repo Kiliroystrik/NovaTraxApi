@@ -145,8 +145,8 @@ entity "delivery_product" as DeliveryProduct {
 entity "tour" as Tour {
   * id : INTEGER <<PK>>
   --
-  departure_date : TIMESTAMP
-  expected_arrival_date : TIMESTAMP
+  start_date : TIMESTAMP
+  end_date : TIMESTAMP
   status_id : INTEGER <<FK>>
   driver_id : INTEGER <<FK>>
   vehicle_id : INTEGER <<FK>>

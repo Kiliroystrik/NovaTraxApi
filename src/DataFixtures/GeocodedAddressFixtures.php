@@ -25,16 +25,16 @@ class GeocodedAddressFixtures extends Fixture implements DependentFixtureInterfa
             $company = $this->getReference('company-' . $i, Company::class);
             for ($i = 0; $i < 100; $i++) {
                 $geocodedAddress = new GeocodedAddress();
-                $geocodedAddress->setFullAddress($faker->address);
-                $geocodedAddress->setLatitude($faker->latitude);
-                $geocodedAddress->setLongitude($faker->longitude);
-                $geocodedAddress->setCity($faker->city);
-                $geocodedAddress->setPostalCode($faker->postcode);
-                $geocodedAddress->setDepartment($faker->countryCode);
-                $geocodedAddress->setCountry($faker->country);
+                $geocodedAddress->setFullAddress($faker->address());
+                $geocodedAddress->setLatitude($faker->latitude());
+                $geocodedAddress->setLongitude($faker->longitude());
+                $geocodedAddress->setCity($faker->city());
+                $geocodedAddress->setPostalCode($faker->postcode());
+                $geocodedAddress->setDepartment($faker->countryCode());
+                $geocodedAddress->setCountry($faker->country());
                 $geocodedAddress->setSource('api');
-                $geocodedAddress->setStreetName($faker->streetName);
-                $geocodedAddress->setStreetNumber($faker->buildingNumber);
+                $geocodedAddress->setStreetName($faker->streetName());
+                $geocodedAddress->setStreetNumber($faker->buildingNumber());
                 $geocodedAddress->setCreatedAt(new DateTimeImmutable());
                 $geocodedAddress->setUpdatedAt(new DateTimeImmutable());
                 $geocodedAddress->setCompany($company);

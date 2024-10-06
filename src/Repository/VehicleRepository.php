@@ -2,8 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\Company;
 use App\Entity\Vehicle;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -40,4 +42,37 @@ class VehicleRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    /**
+     * Récupère les véhicules disponibles pour une plage de dates donnée.
+     *
+     * @param \DateTimeInterface $startDate
+     * @param \DateTimeInterface $endDate
+     * @param Company $company
+     * @return Vehicle[]
+     */
+    public function findAvailableVehicles(\DateTimeInterface $startDate, \DateTimeInterface $endDate, Company $company): array
+    {
+        $qb = $this->createQueryBuilder('v')
+            ->leftJoin(
+                'v.tours',
+                't',
+                Join::WITH,
+                't.startDate < :endDate AND t.endDate > :startDate'
+            )
+            ->leftJoin(
+                'v.unavailabilities',
+                'u',
+                Join::WITH,
+                'u.startDate < :endDate AND u.endDate > :startDate'
+            )
+            ->where('v.company = :company')
+            ->andWhere('t.id IS NULL')
+            ->andWhere('u.id IS NULL')
+            ->setParameter('company', $company)
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate);
+
+        return $qb->getQuery()->getResult();
+    }
 }

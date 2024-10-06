@@ -2,8 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\Company;
 use App\Entity\Driver;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -40,4 +42,38 @@ class DriverRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+
+    /**
+     * Récupère les conducteurs disponibles pour une plage de dates donnée.
+     *
+     * @param \DateTimeInterface $startDate
+     * @param \DateTimeInterface $endDate
+     * @param Company $company
+     * @return Driver[]
+     */
+    public function findAvailableDrivers(\DateTimeInterface $startDate, \DateTimeInterface $endDate, Company $company): array
+    {
+        $qb = $this->createQueryBuilder('d')
+            ->leftJoin(
+                'd.tours',
+                't',
+                Join::WITH,
+                't.startDate < :endDate AND t.endDate > :startDate'
+            )
+            ->leftJoin(
+                'd.unavailabilities',
+                'u',
+                Join::WITH,
+                'u.startDate < :endDate AND u.endDate > :startDate'
+            )
+            ->where('d.company = :company')
+            ->andWhere('t.id IS NULL')
+            ->andWhere('u.id IS NULL')
+            ->setParameter('company', $company)
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate);
+
+        return $qb->getQuery()->getResult();
+    }
 }

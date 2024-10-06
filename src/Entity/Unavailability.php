@@ -2,19 +2,23 @@
 
 namespace App\Entity;
 
-use App\Repository\VehicleAvailabilityRepository;
+use App\Repository\UnavailabilityRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: VehicleAvailabilityRepository::class)]
-class VehicleAvailability
+#[ORM\Entity(repositoryClass: UnavailabilityRepository::class)]
+#[ORM\Table(name: "unavailability")]
+#[ORM\Index(name: "idx_driver", columns: ["driver_id"])]
+#[ORM\Index(name: "idx_vehicle", columns: ["vehicle_id"])]
+#[ORM\Index(name: "idx_reason", columns: ["reason_id"])]
+#[ORM\Index(name: "idx_start_date", columns: ["start_date"])]
+#[ORM\Index(name: "idx_end_date", columns: ["end_date"])]
+
+class Unavailability
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $reason = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $startDate = null;
@@ -28,9 +32,19 @@ class VehicleAvailability
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\ManyToOne(inversedBy: 'vehicleAvailabilities')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(inversedBy: 'unavailabilities')]
+    private ?Driver $driver = null;
+
+    #[ORM\ManyToOne(inversedBy: 'unavailabilities')]
     private ?Vehicle $vehicle = null;
+
+    #[ORM\ManyToOne(inversedBy: 'unavailabilities')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Reason $reason = null;
+
+    #[ORM\ManyToOne(inversedBy: 'unavailabilities')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Company $company = null;
 
     public function __construct()
     {
@@ -40,18 +54,6 @@ class VehicleAvailability
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getReason(): ?string
-    {
-        return $this->reason;
-    }
-
-    public function setReason(string $reason): static
-    {
-        $this->reason = $reason;
-
-        return $this;
     }
 
     public function getStartDate(): ?\DateTimeImmutable
@@ -102,6 +104,18 @@ class VehicleAvailability
         return $this;
     }
 
+    public function getDriver(): ?Driver
+    {
+        return $this->driver;
+    }
+
+    public function setDriver(?Driver $driver): static
+    {
+        $this->driver = $driver;
+
+        return $this;
+    }
+
     public function getVehicle(): ?Vehicle
     {
         return $this->vehicle;
@@ -110,6 +124,30 @@ class VehicleAvailability
     public function setVehicle(?Vehicle $vehicle): static
     {
         $this->vehicle = $vehicle;
+
+        return $this;
+    }
+
+    public function getReason(): ?Reason
+    {
+        return $this->reason;
+    }
+
+    public function setReason(?Reason $reason): static
+    {
+        $this->reason = $reason;
+
+        return $this;
+    }
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): static
+    {
+        $this->company = $company;
 
         return $this;
     }

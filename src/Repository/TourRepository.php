@@ -6,9 +6,6 @@ use App\Entity\Tour;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-/**
- * @extends ServiceEntityRepository<Tour>
- */
 class TourRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -16,28 +13,47 @@ class TourRepository extends ServiceEntityRepository
         parent::__construct($registry, Tour::class);
     }
 
-    //    /**
-    //     * @return Tour[] Returns an array of Tour objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->clientOrderBy('t.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    /**
+     * Récupère les IDs des conducteurs assignés à des tournées chevauchantes.
+     *
+     * @param \DateTimeInterface $startDate
+     * @param \DateTimeInterface $endDate
+     * @return array
+     */
+    public function findDriverIdsWithOverlappingTours(\DateTimeInterface $startDate, \DateTimeInterface $endDate): array
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->select('DISTINCT t.driver')
+            ->where('t.startDate < :endDate')
+            ->andWhere('t.endDate > :startDate')
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate);
 
-    //    public function findOneBySomeField($value): ?Tour
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        $result = $qb->getQuery()->getScalarResult();
+
+        // Extraire les IDs des conducteurs
+        return array_map(fn($row) => $row['driver'], $result);
+    }
+
+    /**
+     * Récupère les IDs des véhicules assignés à des tournées chevauchantes.
+     *
+     * @param \DateTimeInterface $startDate
+     * @param \DateTimeInterface $endDate
+     * @return array
+     */
+    public function findVehicleIdsWithOverlappingTours(\DateTimeInterface $startDate, \DateTimeInterface $endDate): array
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->select('DISTINCT t.vehicle')
+            ->where('t.startDate < :endDate')
+            ->andWhere('t.endDate > :startDate')
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate);
+
+        $result = $qb->getQuery()->getScalarResult();
+
+        // Extraire les IDs des véhicules
+        return array_map(fn($row) => $row['vehicle'], $result);
+    }
 }

@@ -9,6 +9,11 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: DriverRepository::class)]
+#[ORM\Table(name: "driver")]
+#[ORM\Index(name: "idx_driver_company", columns: ["company_id"])]
+#[ORM\Index(name: "idx_driver_license_number", columns: ["license_number"])]
+#[ORM\Index(name: "idx_driver_first_name", columns: ["first_name"])]
+#[ORM\Index(name: "idx_driver_last_name", columns: ["last_name"])]
 class Driver
 {
     #[ORM\Id]
@@ -37,12 +42,6 @@ class Driver
     #[Groups(['driver:read', 'driver:list'])]
     private ?string $licenseNumber = null;
 
-    /**
-     * @var Collection<int, DriverAvailability>
-     */
-    #[ORM\OneToMany(targetEntity: DriverAvailability::class, mappedBy: 'driver', orphanRemoval: true)]
-    private Collection $driverAvailabilities;
-
     #[ORM\ManyToOne(inversedBy: 'drivers')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['driver:read', 'driver:list'])]
@@ -54,11 +53,17 @@ class Driver
     #[ORM\OneToMany(targetEntity: Tour::class, mappedBy: 'driver')]
     private Collection $tours;
 
+    /**
+     * @var Collection<int, Unavailability>
+     */
+    #[ORM\OneToMany(targetEntity: Unavailability::class, mappedBy: 'driver')]
+    private Collection $unavailabilities;
+
     public function __construct()
     {
-        $this->driverAvailabilities = new ArrayCollection();
         $this->tours = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
+        $this->unavailabilities = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -126,36 +131,6 @@ class Driver
         return $this;
     }
 
-    /**
-     * @return Collection<int, DriverAvailability>
-     */
-    public function getDriverAvailabilities(): Collection
-    {
-        return $this->driverAvailabilities;
-    }
-
-    public function addDriverAvailability(DriverAvailability $driverAvailability): static
-    {
-        if (!$this->driverAvailabilities->contains($driverAvailability)) {
-            $this->driverAvailabilities->add($driverAvailability);
-            $driverAvailability->setDriver($this);
-        }
-
-        return $this;
-    }
-
-    public function removeDriverAvailability(DriverAvailability $driverAvailability): static
-    {
-        if ($this->driverAvailabilities->removeElement($driverAvailability)) {
-            // set the owning side to null (unless already changed)
-            if ($driverAvailability->getDriver() === $this) {
-                $driverAvailability->setDriver(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getCompany(): ?Company
     {
         return $this->company;
@@ -192,6 +167,36 @@ class Driver
             // set the owning side to null (unless already changed)
             if ($tour->getDriver() === $this) {
                 $tour->setDriver(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Unavailability>
+     */
+    public function getUnavailabilities(): Collection
+    {
+        return $this->unavailabilities;
+    }
+
+    public function addUnavailability(Unavailability $unavailability): static
+    {
+        if (!$this->unavailabilities->contains($unavailability)) {
+            $this->unavailabilities->add($unavailability);
+            $unavailability->setDriver($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUnavailability(Unavailability $unavailability): static
+    {
+        if ($this->unavailabilities->removeElement($unavailability)) {
+            // set the owning side to null (unless already changed)
+            if ($unavailability->getDriver() === $this) {
+                $unavailability->setDriver(null);
             }
         }
 

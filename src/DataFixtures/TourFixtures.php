@@ -38,8 +38,8 @@ class TourFixtures extends Fixture implements DependentFixtureInterface
                 }
 
                 $tour->setCompany($company);
-                $tour->setDepartureDate(DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-1 year', '+1 year')));
-                $tour->setExpectedArrivalDate(DateTimeImmutable::createFromMutable($faker->dateTimeBetween($tour->getDepartureDate()->format('Y-m-d'), '+1 year')));
+                $tour->setstartDate(DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-1 year', '+1 year')));
+                $tour->setEndDate(DateTimeImmutable::createFromMutable($faker->dateTimeBetween($tour->getstartDate()->format('Y-m-d'), '+1 year')));
 
                 $tour->setStatus($faker->randomElement(['pending', 'delivered', 'cancelled', 'in_transit']));
 
