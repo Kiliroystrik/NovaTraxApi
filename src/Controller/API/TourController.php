@@ -2,8 +2,8 @@
 
 namespace App\Controller\API;
 
-use App\Entity\Vehicle;
-use App\Repository\VehicleRepository;
+use App\Entity\Tour;
+use App\Repository\TourRepository;
 use App\Repository\UserRepository;
 use App\Entity\UnitOfMeasure;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,12 +15,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class VehicleController extends AbstractController
+class TourController extends AbstractController
 {
-    #[Route("/api/vehicles", methods: ["GET"])]
-    public function getVehicles(VehicleRepository $vehicleRepository, Request $request): JsonResponse
+    #[Route("/api/tours", methods: ["GET"])]
+    public function getTours(TourRepository $tourRepository, Request $request): JsonResponse
     {
-        $qb = $vehicleRepository->createQueryBuilder('o')->orderBy('o.createdAt', 'DESC');
+        $qb = $tourRepository->createQueryBuilder('o')->orderBy('o.createdAt', 'DESC');
 
         // Adapter pour la pagination
         $paginator = new Pagerfanta(new QueryAdapter($qb));
@@ -32,22 +32,22 @@ class VehicleController extends AbstractController
             'totalItems' => $paginator->getNbResults(),
             'currentPage' => $paginator->getCurrentPage(),
             'totalPages' => $paginator->getNbPages(),
-        ], 200, [], ['groups' => ['vehicle:list']]);
+        ], 200, [], ['groups' => ['tour:list']]);
     }
 
-    #[Route("/api/vehicles/{id}", methods: ["GET"])]
-    public function getVehicle(VehicleRepository $vehicleRepository, int $id): JsonResponse
+    #[Route("/api/tours/{id}", methods: ["GET"])]
+    public function getTour(TourRepository $tourRepository, int $id): JsonResponse
     {
-        $vehicle = $vehicleRepository->find($id);
-        if (!$vehicle) {
-            return new JsonResponse(['error' => 'Vehicle not found'], Response::HTTP_NOT_FOUND);
+        $tour = $tourRepository->find($id);
+        if (!$tour) {
+            return new JsonResponse(['error' => 'Tour not found'], Response::HTTP_NOT_FOUND);
         }
 
-        return $this->json($vehicle, 200, [], ['groups' => ['vehicle:read']]);
+        return $this->json($tour, 200, [], ['groups' => ['tour:read']]);
     }
 
-    #[Route("/api/vehicles", methods: ["POST"])]
-    public function createVehicle(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    #[Route("/api/tours", methods: ["POST"])]
+    public function createTour(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         try {
             // Récupérer l'utilisateur actuellement connecté
@@ -58,8 +58,8 @@ class VehicleController extends AbstractController
             }
 
             // Récupérer la compagnie associée à l'utilisateur
-            $vehicleCompany = $user->getCompany();
-            if (!$vehicleCompany) {
+            $tourCompany = $user->getCompany();
+            if (!$tourCompany) {
                 throw new \Exception('No company associated with the user');
             }
 
@@ -69,29 +69,24 @@ class VehicleController extends AbstractController
                 throw new \Exception('Invalid JSON');
             }
 
-            // Créer un nouveau vehicle
-            $vehicle = new Vehicle();
-            $vehicle->setCompany($vehicleCompany);
-            // $vehicle->setCapacity($data['capacity']);
-            $vehicle->setLicensePlate($data['licensePlate']);
-            // $vehicle->setModel($data['model']);
-            // $vehicle->setType($data['type']);
-            $vehicle->setWeight($data['weight']);
-            $vehicle->setVolume($data['volume']);
+            // Créer un nouveau tour
+            $tour = new Tour();
+            $tour->setCompany($tourCompany);
+
 
             // Persister la nouvelle commande dans la base de données
-            $entityManager->persist($vehicle);
+            $entityManager->persist($tour);
             $entityManager->flush();
 
             // Renvoyer la commande créée avec les groupes appropriés
-            return $this->json($vehicle, Response::HTTP_CREATED, [], ['groups' => ['vehicle:read']]);
+            return $this->json($tour, Response::HTTP_CREATED, [], ['groups' => ['tour:read']]);
         } catch (\Exception $e) {
             return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
     }
 
-    #[Route("/api/vehicles/{id}", methods: ["PUT", "PATCH"])]
-    public function updateVehicle(int $id, Request $request, EntityManagerInterface $entityManager, VehicleRepository $vehicleRepository): JsonResponse
+    #[Route("/api/tours/{id}", methods: ["PUT", "PATCH"])]
+    public function updateTour(int $id, Request $request, EntityManagerInterface $entityManager, TourRepository $tourRepository): JsonResponse
     {
         try {
             // Récupérer l'utilisateur actuellement connecté
@@ -108,9 +103,9 @@ class VehicleController extends AbstractController
             }
 
             // Récupérer la commande par son ID et vérifier qu'elle appartient à la même compagnie
-            $vehicle = $vehicleRepository->find($id);
-            if (!$vehicle || $vehicle->getCompany() !== $userCompany) {
-                return new JsonResponse(['error' => 'Vehicle not found or does not belong to your company'], Response::HTTP_NOT_FOUND);
+            $tour = $tourRepository->find($id);
+            if (!$tour || $tour->getCompany() !== $userCompany) {
+                return new JsonResponse(['error' => 'Tour not found or does not belong to your company'], Response::HTTP_NOT_FOUND);
             }
 
             // Désérialiser les données de la requête
@@ -121,34 +116,34 @@ class VehicleController extends AbstractController
 
             // Mettre à jour les champs si des données sont fournies
             if (isset($data['capacity'])) {
-                $vehicle->setCapacity($data['capacity']);
+                $tour->setCapacity($data['capacity']);
             }
             if (isset($data['licensePlate'])) {
-                $vehicle->setLicensePlate($data['licensePlate']);
+                $tour->setLicensePlate($data['licensePlate']);
             }
             if (isset($data['model'])) {
-                $vehicle->setModel($data['model']);
+                $tour->setModel($data['model']);
             }
             if (isset($data['type'])) {
-                $vehicle->setType($data['type']);
+                $tour->setType($data['type']);
             }
 
             // Mettre à jour updatedAt
-            $vehicle->setUpdatedAt(new \DateTimeImmutable());
+            $tour->setUpdatedAt(new \DateTimeImmutable());
 
             // Persister les changements
             $entityManager->flush();
 
             // Retourner la commande mise à jour
-            return $this->json($vehicle, Response::HTTP_OK, [], ['groups' => ['vehicle:read']]);
+            return $this->json($tour, Response::HTTP_OK, [], ['groups' => ['tour:read']]);
         } catch (\Exception $e) {
             return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
     }
 
 
-    #[Route("/api/vehicles/{id}", methods: ["DELETE"])]
-    public function deleteVehicle(int $id, EntityManagerInterface $entityManager, VehicleRepository $vehicleRepository): JsonResponse
+    #[Route("/api/tours/{id}", methods: ["DELETE"])]
+    public function deleteTour(int $id, EntityManagerInterface $entityManager, TourRepository $tourRepository): JsonResponse
     {
         try {
             // Récupérer l'utilisateur actuellement connecté
@@ -165,13 +160,13 @@ class VehicleController extends AbstractController
             }
 
             // Récupérer la commande par son ID et vérifier qu'elle appartient à la même compagnie
-            $vehicle = $vehicleRepository->find($id);
-            if (!$vehicle || $vehicle->getCompany() !== $userCompany) {
-                return new JsonResponse(['error' => 'Vehicle not found or does not belong to your company'], Response::HTTP_NOT_FOUND);
+            $tour = $tourRepository->find($id);
+            if (!$tour || $tour->getCompany() !== $userCompany) {
+                return new JsonResponse(['error' => 'Tour not found or does not belong to your company'], Response::HTTP_NOT_FOUND);
             }
 
             // Supprimer la commande
-            $entityManager->remove($vehicle);
+            $entityManager->remove($tour);
             $entityManager->flush();
 
             // Retourner une réponse de succès

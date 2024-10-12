@@ -15,7 +15,7 @@ class Company
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['clientOrder:read', 'companies:read', 'companies:create', 'driver:read', 'driver:list', 'vehicle:read', 'vehicle:list'])]
+    #[Groups(['clientOrder:read', 'companies:read', 'companies:create', 'driver:read', 'driver:list', 'vehicle:read', 'vehicle:list', 'tour:read', 'tour:list'])]
     private ?int $id = null;
 
     #[Groups(['clientOrder:read', 'companies:read', 'companies:create', 'product:read', 'product:list', 'driver:read', 'driver:list', 'vehicle:read', 'vehicle:list'])]
@@ -106,6 +106,18 @@ class Company
     #[ORM\OneToMany(targetEntity: Unavailability::class, mappedBy: 'company', orphanRemoval: true)]
     private Collection $unavailabilities;
 
+    /**
+     * @var Collection<int, ProductCategory>
+     */
+    #[ORM\OneToMany(targetEntity: ProductCategory::class, mappedBy: 'company', orphanRemoval: true)]
+    private Collection $productCategories;
+
+    /**
+     * @var Collection<int, Warehouse>
+     */
+    #[ORM\OneToMany(targetEntity: Warehouse::class, mappedBy: 'company', orphanRemoval: true)]
+    private Collection $warehouses;
+
     public function __construct()
     {
         $this->users = new ArrayCollection();
@@ -119,6 +131,8 @@ class Company
         $this->GeocodedAddresses = new ArrayCollection();
         $this->clients = new ArrayCollection();
         $this->unavailabilities = new ArrayCollection();
+        $this->productCategories = new ArrayCollection();
+        $this->warehouses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -480,6 +494,66 @@ class Company
             // set the owning side to null (unless already changed)
             if ($unavailability->getCompany() === $this) {
                 $unavailability->setCompany(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProductCategory>
+     */
+    public function getProductCategories(): Collection
+    {
+        return $this->productCategories;
+    }
+
+    public function addProductCategory(ProductCategory $productCategory): static
+    {
+        if (!$this->productCategories->contains($productCategory)) {
+            $this->productCategories->add($productCategory);
+            $productCategory->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProductCategory(ProductCategory $productCategory): static
+    {
+        if ($this->productCategories->removeElement($productCategory)) {
+            // set the owning side to null (unless already changed)
+            if ($productCategory->getCompany() === $this) {
+                $productCategory->setCompany(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Warehouse>
+     */
+    public function getWarehouses(): Collection
+    {
+        return $this->warehouses;
+    }
+
+    public function addWarehouse(Warehouse $warehouse): static
+    {
+        if (!$this->warehouses->contains($warehouse)) {
+            $this->warehouses->add($warehouse);
+            $warehouse->setCompany($this);
+        }
+
+        return $this;
+    }
+
+    public function removeWarehouse(Warehouse $warehouse): static
+    {
+        if ($this->warehouses->removeElement($warehouse)) {
+            // set the owning side to null (unless already changed)
+            if ($warehouse->getCompany() === $this) {
+                $warehouse->setCompany(null);
             }
         }
 

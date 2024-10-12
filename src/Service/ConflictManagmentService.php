@@ -5,7 +5,7 @@ namespace App\Service;
 use App\Repository\UnavailabilityRepository;
 use App\Repository\TourRepository;
 
-class ConflictManagementService
+class ConflictManagmentService
 {
     private UnavailabilityRepository $unavailabilityRepository;
     private TourRepository $tourRepository;

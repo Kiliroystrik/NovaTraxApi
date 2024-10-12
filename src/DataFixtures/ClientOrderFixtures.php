@@ -5,8 +5,8 @@ namespace App\DataFixtures;
 use App\Entity\Company;
 use App\Entity\ClientOrder;
 use App\Entity\Client;
-use App\Service\ClientOrderNumberGenerator;
 use App\Service\PasswordHashService;
+use App\Service\SerialNumberGeneratorService;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -15,7 +15,7 @@ use Faker\Factory as FakerFactory;
 
 class ClientOrderFixtures extends Fixture implements DependentFixtureInterface
 {
-    public function __construct(private PasswordHashService $passwordHashService, private ClientOrderNumberGenerator $clientOrderNumberGenerator) {}
+    public function __construct(private PasswordHashService $passwordHashService, private SerialNumberGeneratorService $serialNumberGenerator) {}
 
     public function load(ObjectManager $manager): void
     {
@@ -44,7 +44,7 @@ class ClientOrderFixtures extends Fixture implements DependentFixtureInterface
                 $clientOrder->setClient($client);
 
                 // Numéro de commande
-                $clientOrderNumber = $this->clientOrderNumberGenerator->generate();
+                $clientOrderNumber = $this->serialNumberGenerator->generateOrderNumber();
                 $clientOrder->setOrderNumber($clientOrderNumber);
 
                 // Date de livraison prévue

@@ -19,7 +19,7 @@ class Driver
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['driver:read', 'driver:list'])]
+    #[Groups(['driver:read', 'driver:list', 'tour:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
@@ -31,15 +31,15 @@ class Driver
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['driver:read', 'driver:list'])]
+    #[Groups(['driver:read', 'driver:list', 'tour:read'])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['driver:read', 'driver:list'])]
+    #[Groups(['driver:read', 'driver:list', 'tour:read'])]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['driver:read', 'driver:list'])]
+    #[Groups(['driver:read', 'driver:list', 'tour:read'])]
     private ?string $licenseNumber = null;
 
     #[ORM\ManyToOne(inversedBy: 'drivers')]

@@ -8,6 +8,7 @@ use App\Repository\ClientRepository;
 use App\Repository\UserRepository;
 use App\Entity\Client;
 use App\Service\ClientOrderNumberGenerator;
+use App\Service\SerialNumberGeneratorService;
 use Doctrine\ORM\EntityManagerInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
@@ -52,7 +53,7 @@ class ClientOrderController extends AbstractController
     }
 
     #[Route("/api/orders", methods: ["POST"])]
-    public function createClientOrder(Request $request, EntityManagerInterface $entityManager, ClientRepository $clientRepository, ClientOrderNumberGenerator $clientOrderNumberGenerator): JsonResponse
+    public function createClientOrder(Request $request, EntityManagerInterface $entityManager, ClientRepository $clientRepository, SerialNumberGeneratorService $serialNumberGeneratorService): JsonResponse
     {
         try {
             // Récupérer l'utilisateur actuellement connecté
@@ -85,7 +86,7 @@ class ClientOrderController extends AbstractController
             }
 
             // Je génère un numéro de commande client
-            $clientOrderNumber = $clientOrderNumberGenerator->generate();
+            $clientOrderNumber = $serialNumberGeneratorService->generateOrderNumber();
 
             // Créer une nouvelle commande client
             $clientOrder = new ClientOrder();

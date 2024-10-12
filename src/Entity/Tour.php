@@ -6,6 +6,7 @@ use App\Repository\TourRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: TourRepository::class)]
 #[ORM\Index(name: 'idx_tour_status', columns: ['status'])]
@@ -20,42 +21,61 @@ class Tour
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['tour:read', 'tour:list'])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(['tour:read', 'tour:list'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['tour:read', 'tour:list'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['tour:read', 'tour:list'])]
     private ?\DateTimeImmutable $startDate = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['tour:read', 'tour:list'])]
     private ?\DateTimeImmutable $endDate = null;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['tour:read', 'tour:list'])]
     private ?string $status = null;
 
     #[ORM\ManyToOne(inversedBy: 'tours')]
+    #[Groups(['tour:read'])]
     private ?Driver $driver = null;
 
     #[ORM\ManyToOne(inversedBy: 'tours')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['tour:read', 'tour:list'])]
     private ?Company $company = null;
 
     #[ORM\ManyToOne(inversedBy: 'tours')]
+    #[Groups(['tour:read'])]
     private ?Vehicle $vehicle = null;
 
     /**
      * @var Collection<int, Delivery>
      */
     #[ORM\OneToMany(targetEntity: Delivery::class, mappedBy: 'tour')]
+    #[Groups(['tour:read'])]
     private Collection $deliveries;
+
+    #[ORM\Column(length: 20, unique: true)]
+    #[Groups(['tour:read', 'tour:list'])]
+    private ?string $tourNumber = null;
+
+    #[ORM\ManyToOne(inversedBy: 'tours')]
+    #[Groups(['tour:read', 'tour:list'])]
+    private ?Warehouse $loading = null;
 
     public function __construct()
     {
         $this->deliveries = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -185,6 +205,30 @@ class Tour
                 $delivery->setTour(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getTourNumber(): ?string
+    {
+        return $this->tourNumber;
+    }
+
+    public function setTourNumber(string $tourNumber): static
+    {
+        $this->tourNumber = $tourNumber;
+
+        return $this;
+    }
+
+    public function getLoading(): ?Warehouse
+    {
+        return $this->loading;
+    }
+
+    public function setLoading(?Warehouse $loading): static
+    {
+        $this->loading = $loading;
 
         return $this;
     }

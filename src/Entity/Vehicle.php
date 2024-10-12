@@ -17,7 +17,7 @@ class Vehicle
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['vehicle:read', 'vehicle:list'])]
+    #[Groups(['vehicle:read', 'vehicle:list', 'tour:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
@@ -29,20 +29,16 @@ class Vehicle
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['vehicle:read', 'vehicle:list'])]
+    #[Groups(['vehicle:read', 'vehicle:list', 'tour:read'])]
     private ?string $licensePlate = null;
 
-    #[ORM\Column(length: 50)]
-    #[Groups(['vehicle:read', 'vehicle:list'])]
-    private ?string $type = null;
-
-    #[ORM\Column(length: 50)]
-    #[Groups(['vehicle:read', 'vehicle:list'])]
-    private ?string $model = null;
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[Groups(['vehicle:read', 'vehicle:list', 'tour:read'])]
+    private ?string $weight = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
-    #[Groups(['vehicle:read', 'vehicle:list'])]
-    private ?string $capacity = null;
+    #[Groups(['vehicle:read', 'vehicle:list', 'tour:read'])]
+    private ?string $volume = null;
 
     #[ORM\ManyToOne(inversedBy: 'vehicles')]
     #[ORM\JoinColumn(nullable: false)]
@@ -109,38 +105,26 @@ class Vehicle
         return $this;
     }
 
-    public function getType(): ?string
+    public function getWeight(): ?string
     {
-        return $this->type;
+        return $this->weight;
     }
 
-    public function setType(string $type): static
+    public function setWeight(string $weight): static
     {
-        $this->type = $type;
+        $this->weight = $weight;
 
         return $this;
     }
 
-    public function getModel(): ?string
+    public function getVolume(): ?string
     {
-        return $this->model;
+        return $this->volume;
     }
 
-    public function setModel(string $model): static
+    public function setVolume(string $volume): static
     {
-        $this->model = $model;
-
-        return $this;
-    }
-
-    public function getCapacity(): ?string
-    {
-        return $this->capacity;
-    }
-
-    public function setCapacity(string $capacity): static
-    {
-        $this->capacity = $capacity;
+        $this->volume = $volume;
 
         return $this;
     }

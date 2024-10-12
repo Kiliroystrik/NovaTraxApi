@@ -14,7 +14,7 @@ class UnitOfMeasure
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['clientOrder:read', 'delivery:read', 'unitOfMeasure:read', 'unitOfMeasure:list', 'product:read', 'product:list'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'unitOfMeasure:read', 'unitOfMeasure:list', 'product:read', 'product:list', 'tour:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
@@ -26,11 +26,11 @@ class UnitOfMeasure
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 50, unique: true)]
-    #[Groups(['clientOrder:read', 'delivery:read', 'unitOfMeasure:read', 'unitOfMeasure:list', 'product:read', 'product:list'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'unitOfMeasure:read', 'unitOfMeasure:list', 'product:read', 'product:list', 'tour:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 10)]
-    #[Groups(['clientOrder:read', 'delivery:read', 'unitOfMeasure:read', 'unitOfMeasure:list', 'product:read', 'product:list'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'unitOfMeasure:read', 'unitOfMeasure:list', 'product:read', 'product:list', 'tour:read'])]
     private ?string $symbol = null;
 
     /**

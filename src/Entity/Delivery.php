@@ -22,7 +22,7 @@ class Delivery
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'tour:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
@@ -34,15 +34,15 @@ class Delivery
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'tour:read'])]
     private ?string $status = null;
 
     #[ORM\Column]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'tour:read'])]
     private ?\DateTimeImmutable $expectedDeliveryDate = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'tour:read'])]
     private ?\DateTimeImmutable $actualDeliveryDate = null;
 
     #[ORM\ManyToOne(inversedBy: 'deliveries')]
@@ -52,25 +52,21 @@ class Delivery
     #[ORM\JoinColumn(nullable: false)]
     private ?Company $company = null;
 
-    /**
-     * @var Collection<int, DeliveryProduct>
-     */
-    #[ORM\OneToMany(targetEntity: DeliveryProduct::class, mappedBy: 'delivery', orphanRemoval: true)]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
-    private Collection $productDeliveries;
-
     #[ORM\ManyToOne(inversedBy: 'deliveries')]
     #[ORM\JoinColumn(nullable: false)]
     private ?ClientOrder $clientOrder = null;
 
     #[ORM\ManyToOne(inversedBy: 'deliveries')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'tour:read'])]
     private ?GeocodedAddress $geocodedAddress = null;
+
+    #[ORM\OneToMany(mappedBy: 'delivery', targetEntity: DeliveryProduct::class, cascade: ['persist', 'remove'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'tour:read'])]
+    private Collection $productDeliveries;
 
     public function __construct()
     {
-        $this->productDeliveries = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
     }
 
@@ -163,36 +159,6 @@ class Delivery
         return $this;
     }
 
-    /**
-     * @return Collection<int, DeliveryProduct>
-     */
-    public function getProductDeliveries(): Collection
-    {
-        return $this->productDeliveries;
-    }
-
-    public function addDeliveryProduct(DeliveryProduct $deliveryProduct): static
-    {
-        if (!$this->productDeliveries->contains($deliveryProduct)) {
-            $this->productDeliveries->add($deliveryProduct);
-            $deliveryProduct->setDelivery($this);
-        }
-
-        return $this;
-    }
-
-    public function removeDeliveryProduct(DeliveryProduct $deliveryProduct): static
-    {
-        if ($this->productDeliveries->removeElement($deliveryProduct)) {
-            // set the owning side to null (unless already changed)
-            if ($deliveryProduct->getDelivery() === $this) {
-                $deliveryProduct->setDelivery(null);
-            }
-        }
-
-        return $this;
-    }
-
     public function getClientOrder(): ?ClientOrder
     {
         return $this->clientOrder;
@@ -213,6 +179,36 @@ class Delivery
     public function setGeocodedAddress(?GeocodedAddress $geocodedAddress): static
     {
         $this->geocodedAddress = $geocodedAddress;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, DeliveryProduct>
+     */
+    public function getProductDeliveries(): Collection
+    {
+        return $this->productDeliveries;
+    }
+
+    public function addProductDelivery(DeliveryProduct $productDelivery): self
+    {
+        if (!$this->productDeliveries->contains($productDelivery)) {
+            $this->productDeliveries->add($productDelivery);
+            $productDelivery->setDelivery($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProductDelivery(DeliveryProduct $productDelivery): self
+    {
+        if ($this->productDeliveries->removeElement($productDelivery)) {
+            // set the owning side to null (unless already changed)
+            if ($productDelivery->getDelivery() === $this) {
+                $productDelivery->setDelivery(null);
+            }
+        }
 
         return $this;
     }

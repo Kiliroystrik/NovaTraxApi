@@ -27,9 +27,13 @@ class VehicleFixtures extends Fixture implements DependentFixtureInterface
                 $vehicle = new Vehicle();
                 $vehicle->setCompany($company);
                 $vehicle->setLicensePlate($faker->ean8());
-                $vehicle->setType($faker->word());
-                $vehicle->setModel($faker->word());
-                $vehicle->setCapacity($faker->randomFloat(2, 1, 10));
+
+                // Définir le poids et le volume
+                $weight = $faker->randomFloat(2, 1000, 20000); // Poids entre 1,000 kg et 20,000 kg
+                $volume = $faker->randomFloat(2, 5, 100);     // Volume entre 5 m³ et 100 m³
+
+                $vehicle->setWeight(number_format($weight, 2, '.', '')); // Stocker comme string
+                $vehicle->setVolume(number_format($volume, 2, '.', ''));
 
                 $manager->persist($vehicle);
 

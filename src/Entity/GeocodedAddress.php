@@ -15,59 +15,59 @@ class GeocodedAddress
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'tour:read', 'warehouse:read', 'warehouse:list'])]
     private ?int $id = null;
 
     #[ORM\Column]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'warehouse:read', 'warehouse:list'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'warehouse:read', 'warehouse:list'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'tour:read', 'warehouse:read', 'warehouse:list'])]
     private ?string $streetName = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'tour:read', 'warehouse:read', 'warehouse:list'])]
     private ?string $fullAddress = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'tour:read', 'warehouse:read', 'warehouse:list'])]
     private ?string $city = null;
 
     #[ORM\Column(length: 20)]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'tour:read', 'warehouse:read', 'warehouse:list'])]
     private ?string $postalCode = null;
 
     #[ORM\Column(length: 10, nullable: true)]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'tour:read', 'warehouse:read', 'warehouse:list'])]
     private ?string $department = null;
 
     #[ORM\Column(length: 100)]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'tour:read', 'warehouse:read', 'warehouse:list'])]
     private ?string $country = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 8, nullable: true)]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'tour:read', 'warehouse:read', 'warehouse:list'])]
     private ?string $latitude = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 11, scale: 8, nullable: true)]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'tour:read', 'warehouse:read', 'warehouse:list'])]
     private ?string $longitude = null;
 
     #[ORM\Column(length: 10)]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'tour:read', 'warehouse:read', 'warehouse:list'])]
     private ?string $streetNumber = null;
 
     #[ORM\Column]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'tour:read', 'warehouse:read', 'warehouse:list'])]
     private ?bool $isVerified = null;
 
     #[ORM\Column(length: 20)]
-    #[Groups(['clientOrder:read', 'delivery:read'])]
+    #[Groups(['clientOrder:read', 'delivery:read', 'tour:read', 'warehouse:read', 'warehouse:list'])]
     private ?string $source = null;
 
     /**
@@ -80,11 +80,18 @@ class GeocodedAddress
     #[ORM\JoinColumn(nullable: false)]
     private ?Company $company = null;
 
+    /**
+     * @var Collection<int, Warehouse>
+     */
+    #[ORM\OneToMany(targetEntity: Warehouse::class, mappedBy: 'address', orphanRemoval: true)]
+    private Collection $warehouses;
+
     public function __construct()
     {
         $this->deliveries = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
         $this->isVerified = false;
+        $this->warehouses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -287,6 +294,36 @@ class GeocodedAddress
     public function setCompany(?Company $company): static
     {
         $this->company = $company;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Warehouse>
+     */
+    public function getWarehouses(): Collection
+    {
+        return $this->warehouses;
+    }
+
+    public function addWarehouse(Warehouse $warehouse): static
+    {
+        if (!$this->warehouses->contains($warehouse)) {
+            $this->warehouses->add($warehouse);
+            $warehouse->setAddress($this);
+        }
+
+        return $this;
+    }
+
+    public function removeWarehouse(Warehouse $warehouse): static
+    {
+        if ($this->warehouses->removeElement($warehouse)) {
+            // set the owning side to null (unless already changed)
+            if ($warehouse->getAddress() === $this) {
+                $warehouse->setAddress(null);
+            }
+        }
 
         return $this;
     }
