@@ -3,12 +3,13 @@
 namespace App\Controller\API;
 
 use App\Entity\ClientOrder;
+use App\Entity\User;
+use App\Enum\StatusName;
+use App\Enum\StatusType;
 use App\Repository\ClientOrderRepository;
 use App\Repository\ClientRepository;
-use App\Repository\UserRepository;
-use App\Entity\Client;
-use App\Service\ClientOrderNumberGenerator;
 use App\Service\SerialNumberGeneratorService;
+use App\Service\StatusService;
 use Doctrine\ORM\EntityManagerInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
@@ -17,12 +18,18 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Role\Role;
-use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ClientOrderController extends AbstractController
 {
+    private StatusService $statusService;
+    private SerialNumberGeneratorService $serialNumberGeneratorService;
+
+    public function __construct(StatusService $statusService, SerialNumberGeneratorService $serialNumberGeneratorService)
+    {
+        $this->statusService = $statusService;
+        $this->serialNumberGeneratorService = $serialNumberGeneratorService;
+    }
+
     #[Route("/api/orders", methods: ["GET"])]
     public function getClientOrders(ClientOrderRepository $clientOrderRepository, Request $request): JsonResponse
     {
@@ -53,8 +60,11 @@ class ClientOrderController extends AbstractController
     }
 
     #[Route("/api/orders", methods: ["POST"])]
-    public function createClientOrder(Request $request, EntityManagerInterface $entityManager, ClientRepository $clientRepository, SerialNumberGeneratorService $serialNumberGeneratorService): JsonResponse
-    {
+    public function createClientOrder(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        ClientRepository $clientRepository
+    ): JsonResponse {
         try {
             // Récupérer l'utilisateur actuellement connecté
             /** @var User $user */
@@ -85,17 +95,30 @@ class ClientOrderController extends AbstractController
                 throw new \Exception('Client ID is required');
             }
 
-            // Je génère un numéro de commande client
-            $clientOrderNumber = $serialNumberGeneratorService->generateOrderNumber();
+            // Générer un numéro de commande client
+            $clientOrderNumber = $this->serialNumberGeneratorService->generateOrderNumber();
 
             // Créer une nouvelle commande client
             $clientOrder = new ClientOrder();
             if (isset($data['expectedDeliveryDate']) && !empty($data['expectedDeliveryDate'])) {
                 $clientOrder->setExpectedDeliveryDate(new \DateTimeImmutable($data['expectedDeliveryDate']));
             }
-            // $clientOrder->setExpectedDeliveryDate(new \DateTimeImmutable($data['expectedDeliveryDate'] ?? null));
             $clientOrder->setOrderNumber($clientOrderNumber);
-            $clientOrder->setStatus($data['status'] ?? 'pending');
+
+            // Remplacer l'assignation de statut par l'entité Status
+            if (isset($data['status'])) {
+                $statusName = $data['status'];
+
+                // Utiliser le StatusService pour récupérer le statut
+                $status = $this->statusService->getStatus(StatusType::CLIENT_ORDER, $statusName);
+
+                $clientOrder->setStatus($status);
+            } else {
+                // Définir un statut par défaut si nécessaire, par exemple 'Pending'
+                $status = $this->statusService->getStatus(StatusType::CLIENT_ORDER, StatusName::PENDING);
+                $clientOrder->setStatus($status);
+            }
+
             $clientOrder->setClient($client); // Associer le client trouvé à la commande
             $clientOrder->setCompany($clientOrderCompany);
 
@@ -111,8 +134,13 @@ class ClientOrderController extends AbstractController
     }
 
     #[Route("/api/orders/{id}", methods: ["PUT", "PATCH"])]
-    public function updateClientOrder(int $id, Request $request, EntityManagerInterface $entityManager, ClientOrderRepository $clientOrderRepository, ClientRepository $clientRepository): JsonResponse
-    {
+    public function updateClientOrder(
+        int $id,
+        Request $request,
+        EntityManagerInterface $entityManager,
+        ClientOrderRepository $clientOrderRepository,
+        ClientRepository $clientRepository
+    ): JsonResponse {
         try {
             // Récupérer l'utilisateur actuellement connecté
             /** @var User $user */
@@ -139,7 +167,7 @@ class ClientOrderController extends AbstractController
                 throw new \Exception('Invalid JSON');
             }
 
-            // Mettre à jour les champs si des données sont fournies
+            // Mettre à jour les champs
             if (isset($data['expectedDeliveryDate']) && !empty($data['expectedDeliveryDate'])) {
                 $clientOrder->setExpectedDeliveryDate(new \DateTimeImmutable($data['expectedDeliveryDate']));
             } else {
@@ -147,7 +175,12 @@ class ClientOrderController extends AbstractController
             }
 
             if (isset($data['status'])) {
-                $clientOrder->setStatus($data['status']);
+                $statusName = $data['status'];
+
+                // Utiliser le StatusService pour récupérer le statut
+                $status = $this->statusService->getStatus(StatusType::CLIENT_ORDER, $statusName);
+
+                $clientOrder->setStatus($status);
             }
 
             if (isset($data['client'])) {
@@ -168,12 +201,13 @@ class ClientOrderController extends AbstractController
         }
     }
 
-
     #[Route("/api/orders/{id}", methods: ["DELETE"])]
-    public function deleteClientOrder(int $id, EntityManagerInterface $entityManager, ClientOrderRepository $clientOrderRepository): JsonResponse
-    {
+    public function deleteClientOrder(
+        int $id,
+        EntityManagerInterface $entityManager,
+        ClientOrderRepository $clientOrderRepository
+    ): JsonResponse {
         try {
-            // Récupérer l'utilisateur actuellement connecté
             /** @var User $user */
             $user = $this->getUser();
             if (!$user) {

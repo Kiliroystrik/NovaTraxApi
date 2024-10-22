@@ -2,9 +2,11 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Company;
 use App\Entity\ClientOrder;
+use App\Entity\Company;
 use App\Entity\Client;
+use App\Entity\Status;
+use App\Enum\StatusName;
 use App\Service\PasswordHashService;
 use App\Service\SerialNumberGeneratorService;
 use DateTimeImmutable;
@@ -21,8 +23,13 @@ class ClientOrderFixtures extends Fixture implements DependentFixtureInterface
     {
         $faker = FakerFactory::create('fr_FR');
 
-        // Statuts possibles pour une commande
-        $statuses = ['pending', 'delivered', 'cancelled'];
+        // Définir les statuts disponibles
+        $statuses = [
+            StatusName::PENDING,
+            StatusName::CONFIRMED,
+            StatusName::CANCELLED,
+            StatusName::COMPLETED,
+        ];
 
         // Compteur pour les références uniques
         $breaker = 0;
@@ -33,7 +40,7 @@ class ClientOrderFixtures extends Fixture implements DependentFixtureInterface
             /** @var Company $randomCompany */
             $randomCompany = $this->getReference('company-' . $i, Company::class);
 
-            // Pour chaque entreprise, on va associer des commandes à ses clients
+            // Pour chaque entreprise, associer des commandes à ses clients
             for ($j = 0; $j < 10; $j++) {
                 /** @var Client $client */
                 $client = $this->getReference('client-' . $breaker, Client::class);
@@ -43,15 +50,20 @@ class ClientOrderFixtures extends Fixture implements DependentFixtureInterface
                 $clientOrder->setCompany($randomCompany);
                 $clientOrder->setClient($client);
 
-                // Numéro de commande
+                // Numéro de commande
                 $clientOrderNumber = $this->serialNumberGenerator->generateOrderNumber();
                 $clientOrder->setOrderNumber($clientOrderNumber);
 
                 // Date de livraison prévue
                 $clientOrder->setExpectedDeliveryDate(DateTimeImmutable::createFromMutable($faker->dateTimeThisYear()));
 
-                // Statut de la commande
-                $clientOrder->setStatus($faker->randomElement($statuses));
+                // Sélectionner un statut aléatoire
+                $statusName = $faker->randomElement($statuses);
+                $statusReference = "status_ClientOrder_{$statusName}";
+
+                /** @var Status $status */
+                $status = $this->getReference($statusReference);
+                $clientOrder->setStatus($status);
 
                 // Persister la commande dans l'EntityManager
                 $manager->persist($clientOrder);
@@ -73,6 +85,7 @@ class ClientOrderFixtures extends Fixture implements DependentFixtureInterface
         return [
             CompanyFixtures::class,
             ClientFixtures::class,
+            StatusFixtures::class,
         ];
     }
 }

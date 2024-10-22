@@ -29,6 +29,11 @@ class DeliveryProduct
     #[Groups(['clientOrder:read', 'delivery:read', 'tour:read'])]
     private ?string $quantity = null;
 
+    #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2, nullable: true)]
+    #[Groups(['clientOrder:read', 'delivery:read', 'tour:read'])]
+    private ?string $temperature = null; // Optionnel, uniquement si le produit est sensible
+
+
     public function getId(): ?int
     {
         return $this->id;
@@ -67,6 +72,17 @@ class DeliveryProduct
     {
         $this->quantity = $quantity;
 
+        return $this;
+    }
+
+    public function getTemperature(): ?float
+    {
+        return $this->temperature !== null ? (float)$this->temperature : null;
+    }
+
+    public function setTemperature(?float $temperature): static
+    {
+        $this->temperature = $temperature !== null ? (string)$temperature : null;
         return $this;
     }
 }

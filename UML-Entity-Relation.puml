@@ -1,244 +1,215 @@
 @startuml Entity-Relation
-' Définir les entités et leurs attributs
+' Définition des stéréotypes pour les clés primaires et étrangères
+!define PK(x) <b>x</b>
+!define FK(x) <i>x</i>
 
-entity "status" as Status {
-  * id : INTEGER <<PK>>
-  --
-  name : VARCHAR(50) <<UNIQUE>>
-}
-
-entity "marque" as Marque {
-  * id : INTEGER <<PK>>
-  --
-  name : VARCHAR(50) <<UNIQUE>>
-}
-
-entity "model" as Model {
-  * id : INTEGER <<PK>>
-  --
-  name : VARCHAR(50)
-  marque_id : INTEGER <<FK>>
-}
-
-entity "vehicle" as Vehicle {
-  * id : INTEGER <<PK>>
-  --
-  license_plate : VARCHAR(50) <<UNIQUE>>
-  model_id : INTEGER <<FK>>
-  capacity : DOUBLE PRECISION
-  company_id : INTEGER <<FK>>
+' Définition des entités avec leurs attributs
+entity "Company" as company {
+  PK(id) : INT
+  name : VARCHAR(100)
   created_at : TIMESTAMP
   updated_at : TIMESTAMP
-}
-
-entity "reason" as Reason {
-  * id : INTEGER <<PK>>
-  --
-  description : VARCHAR(255) <<UNIQUE>>
-}
-
-entity "unavailability" as Unavailability {
-  * id : INTEGER <<PK>>
-  --
-  driver_id : INTEGER <<FK>>
-  vehicle_id : INTEGER <<FK>>
-  reason_id : INTEGER <<FK>>
-  start_date : TIMESTAMP
-  end_date : TIMESTAMP
-  created_at : TIMESTAMP
-  updated_at : TIMESTAMP
-}
-
-entity "company" as Company {
-  * id : INTEGER <<PK>>
-  --
-  name : VARCHAR(255)
-  contact_email : VARCHAR(100) <<UNIQUE>>
+  contact_email : VARCHAR(50) <<unique>>
   contact_phone : VARCHAR(50)
-  geocoded_address_id : INTEGER <<FK>>
-  created_at : TIMESTAMP
-  updated_at : TIMESTAMP
 }
 
-entity "user" as User {
-  * id : INTEGER <<PK>>
-  --
-  email : VARCHAR(255) <<UNIQUE>>
-  password : VARCHAR(255)
-  first_name : VARCHAR(50)
-  last_name : VARCHAR(50)
-  role : VARCHAR(50)
-  company_id : INTEGER <<FK>>
-  created_at : TIMESTAMP
-  updated_at : TIMESTAMP
+entity "Client" as client {
+  PK(id) : INT
+  FK(company_id) : INT
+  name : VARCHAR(100)
 }
 
-entity "driver" as Driver {
-  * id : INTEGER <<PK>>
-  --
+entity "ClientOrder" as client_order {
+  PK(id) : INT
+  FK(company_id) : INT
+  FK(client_id) : INT
+  order_number : VARCHAR(20) <<unique>>
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+  expected_delivery_date : TIMESTAMP
+  status : VARCHAR(50)
+}
+
+entity "Delivery" as delivery {
+  PK(id) : INT
+  FK(tour_id) : INT
+  FK(company_id) : INT
+  FK(client_order_id) : INT
+  FK(geocoded_address_id) : INT
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+  status : VARCHAR(50)
+  expected_delivery_date : TIMESTAMP
+  actual_delivery_date : TIMESTAMP
+}
+
+entity "Delivery Product" as delivery_product {
+  PK(id) : INT
+  FK(product_id) : INT
+  FK(delivery_id) : INT
+  quantity : NUMERIC(14,3)
+  temperature : NUMERIC(5,2)
+}
+
+entity "Driver" as driver {
+  PK(id) : INT
+  FK(company_id) : INT
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
   first_name : VARCHAR(50)
   last_name : VARCHAR(50)
   license_number : VARCHAR(50)
-  company_id : INTEGER <<FK>>
+}
+
+entity "Geocoded Address" as geocoded_address {
+  PK(id) : INT
+  FK(company_id) : INT
   created_at : TIMESTAMP
   updated_at : TIMESTAMP
-}
-
-entity "Client" as Client {
-  * id : BIGINT <<PK>>
-  --
-  name : VARCHAR(255)
-}
-
-entity "ClientOrder" as ClientOrder {
-  * id : INTEGER <<PK>>
-  --
-  expected_delivery_date : TIMESTAMP
-  status_id : INTEGER <<FK>>
-  company_id : INTEGER <<FK>>
-  created_at : TIMESTAMP
-  updated_at : TIMESTAMP
-  customer_id : BIGINT <<FK>>
-}
-
-entity "delivery" as Delivery {
-  * id : INTEGER <<PK>>
-  --
-  order_id : INTEGER <<FK>>
-  tour_id : INTEGER <<FK>>
-  status_id : INTEGER <<FK>>
-  geocoded_address_id : INTEGER <<FK>>
-  expected_delivery_date : TIMESTAMP
-  actual_delivery_date : TIMESTAMP
-  company_id : INTEGER <<FK>>
-  created_at : TIMESTAMP
-  updated_at : TIMESTAMP
-}
-
-entity "product" as Product {
-  * id : INTEGER <<PK>>
-  --
-  name : VARCHAR(100)
-  description : TEXT
-  unit_of_measure_id : INTEGER <<FK>>
-  company_id : INTEGER <<FK>>
-  created_at : TIMESTAMP
-  updated_at : TIMESTAMP
-}
-
-entity "unit_of_measure" as UnitOfMeasure {
-  * id : INTEGER <<PK>>
-  --
-  name : VARCHAR(50) <<UNIQUE>>
-  created_at : TIMESTAMP
-  updated_at : TIMESTAMP
-}
-
-entity "delivery_product" as DeliveryProduct {
-  * id : INTEGER <<PK>>
-  --
-  product_id : INTEGER <<FK>>
-  delivery_id : INTEGER <<FK>>
-  quantity : DECIMAL(14, 3)
-}
-
-entity "tour" as Tour {
-  * id : INTEGER <<PK>>
-  --
-  start_date : TIMESTAMP
-  end_date : TIMESTAMP
-  status_id : INTEGER <<FK>>
-  driver_id : INTEGER <<FK>>
-  vehicle_id : INTEGER <<FK>>
-  company_id : INTEGER <<FK>>
-  created_at : TIMESTAMP
-  updated_at : TIMESTAMP
-}
-
-entity "geocoded_address" as GeocodedAddress {
-  * id : INTEGER <<PK>>
-  --
-  full_address : TEXT
   street_name : VARCHAR(255)
-  street_number : INTEGER
+  full_address : TEXT
   city : VARCHAR(255)
   postal_code : VARCHAR(20)
   department : VARCHAR(10)
   country : VARCHAR(100)
-  latitude : DECIMAL(10, 8)
-  longitude : DECIMAL(11, 8)
-  isVerified : BOOLEAN
-  type : VARCHAR(10)
+  latitude : NUMERIC(10,8)
+  longitude : NUMERIC(11,8)
+  street_number : VARCHAR(10)
+  is_verified : BOOLEAN
+  source : VARCHAR(20)
+}
+
+entity "Product" as product {
+  PK(id) : INT
+  FK(company_id) : INT
+  name : VARCHAR(100)
+  description : TEXT
+  weight_kg : NUMERIC(10,3)
+  is_hazardous : BOOLEAN
+  hazard_class : VARCHAR(50)
+  adr_compliant : BOOLEAN
+  type : VARCHAR(255)
+  density_kg_per_liter : NUMERIC(10,3)
+  is_temperature_sensitive : BOOLEAN
+  thermal_expansion_coefficient_per_degree_celsius : NUMERIC(10,6)
+  length_cm : NUMERIC(10,2)
+  width_cm : NUMERIC(10,2)
+  height_cm : NUMERIC(10,2)
+}
+
+entity "Product Category" as product_category {
+  PK(id) : INT
+  FK(company_id) : INT
+  name : VARCHAR(100)
+}
+
+entity "Reason" as reason {
+  PK(id) : INT
+  name : VARCHAR(100) <<unique>>
+  type : VARCHAR(50)
+  description : VARCHAR(255)
+}
+
+entity "Refresh Tokens" as refresh_tokens {
+  PK(id) : INT
+  refresh_token : VARCHAR(128) <<unique>>
+  username : VARCHAR(255)
+  valid : TIMESTAMP
+}
+
+entity "Tour" as tour {
+  PK(id) : INT
+  FK(driver_id) : INT
+  FK(company_id) : INT
+  FK(vehicle_id) : INT
+  FK(loading_id) : INT
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+  start_date : TIMESTAMP
+  end_date : TIMESTAMP
+  status : VARCHAR(50)
+  tour_number : VARCHAR(20) <<unique>>
+}
+
+entity "Unavailability" as unavailability {
+  PK(id) : INT
+  FK(driver_id) : INT
+  FK(vehicle_id) : INT
+  FK(reason_id) : INT
+  FK(company_id) : INT
+  start_date : TIMESTAMP
+  end_date : TIMESTAMP
   created_at : TIMESTAMP
   updated_at : TIMESTAMP
 }
 
-' Définir les relations entre les entités
+entity "User" as user {
+  PK(id) : INT
+  FK(company_id) : INT
+  email : VARCHAR(180) <<unique>>
+  roles : JSON
+  password : VARCHAR(255)
+  first_name : VARCHAR(50)
+  last_name : VARCHAR(50)
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+}
 
-' Relations pour les statuts
-Status ||--o{ ClientOrder : defines
-Status ||--o{ Tour : defines
-Status ||--o{ Delivery : defines
+entity "Vehicle" as vehicle {
+  PK(id) : INT
+  FK(company_id) : INT
+  created_at : TIMESTAMP
+  updated_at : TIMESTAMP
+  license_plate : VARCHAR(50)
+  weight : NUMERIC(10,2)
+  volume : NUMERIC(10,2)
+}
 
-' Relations pour marque et model
-Marque ||--o{ Model : has
-Model ||--|| Vehicle : uses
+entity "Warehouse" as warehouse {
+  PK(id) : INT
+  FK(address_id) : INT
+  FK(company_id) : INT
+  name : VARCHAR(100)
+}
 
-' Relations pour vehicle
-Company ||--o{ Vehicle : owns
-Vehicle ||--o{ Unavailability : relates to
-Vehicle ||--o{ Tour : assigned to
+' Définition des relations entre les entités
+company ||--o{ client : "possède"
+company ||--o{ client_order : "possède"
+company ||--o{ delivery : "possède"
+company ||--o{ driver : "employe"
+company ||--o{ geocoded_address : "possède"
+company ||--o{ product : "possède"
+company ||--o{ product_category : "possède"
+company ||--o{ tour : "possède"
+company ||--o{ unavailability : "possède"
+company ||--o{ user : "possède"
+company ||--o{ vehicle : "possède"
+company ||--o{ warehouse : "possède"
 
-' Relations pour reason
-Reason ||--o{ Unavailability : defines
+client ||--o{ client_order : "passe"
+client_order ||--o{ delivery : "contient"
 
-' Relations pour unavailability
-Driver ||--o{ Unavailability : has
-Vehicle ||--o{ Unavailability : has
+tour ||--o{ delivery : "contient"
 
-' Relations pour company
-Company ||--o{ User : employs
-Company ||--o{ Driver : employs
-Company ||--o{ Client : serves
-Company ||--o{ Product : offers
-Company ||--o{ Tour : manages
-Company ||--|| GeocodedAddress : located at
-Company ||--o{ Delivery : handles
+delivery ||--o{ delivery_product : "inclut"
 
-' Relations pour user
-User ||--o{ Tour : manages
+driver ||--o{ tour : "conduit"
+driver ||--o{ unavailability : "a"
 
-' Relations pour driver
-Driver ||--o{ Tour : assigned to
+vehicle ||--o{ tour : "utilisé par"
+vehicle ||--o{ unavailability : "a"
 
-' Relations pour Client et ClientOrder
-Client ||--o{ ClientOrder : places
-ClientOrder ||--|| Delivery : leads to
-ClientOrder ||--|| Company : belongs to
-ClientOrder ||--|| Client : customer
+geocoded_address ||--o{ delivery : "associe à"
+geocoded_address ||--o{ warehouse : "localisé à"
 
-' Relations pour Delivery
-Delivery ||--|| GeocodedAddress : located at
-Delivery ||--o{ DeliveryProduct : includes
-Delivery ||--|| Company : belongs to
-Delivery ||--|| Tour : part of
+product ||--o{ delivery_product : "est dans"
 
-' Relations pour Product
-Product ||--|| Company : belongs to
-Product ||--|| UnitOfMeasure : uses
-Product ||--o{ DeliveryProduct : included in
+product_category ||--o{ product : "classifié comme"
 
-' Relations pour UnitOfMeasure
-UnitOfMeasure ||--o{ Product : measures
+reason ||--o{ unavailability : "causé par"
 
-' Relations pour DeliveryProduct
-DeliveryProduct ||--|| Product : refers to
-DeliveryProduct ||--|| Delivery : refers to
+warehouse ||--o{ tour : "charge"
 
-' Relations pour Tour
-Tour ||--|| Company : belongs to
-Tour ||--|| Driver : uses
-Tour ||--|| Vehicle : uses
-Tour ||--o{ Delivery : includes
+user ||--o{ company : "appartient à"
 
 @enduml

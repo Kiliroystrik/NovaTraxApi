@@ -7,9 +7,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
+#[ORM\InheritanceType('SINGLE_TABLE')]
+#[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
+#[ORM\DiscriminatorMap(['liquid' => LiquidProduct::class, 'solid' => SolidProduct::class])]
 class Product
 {
     #[ORM\Id]
@@ -18,14 +21,6 @@ class Product
     #[Groups(['clientOrder:read', 'delivery:read', 'product:read', 'product:list', 'tour:read'])]
     private ?int $id = null;
 
-    #[ORM\Column]
-    #[Groups(['clientOrder:read', 'delivery:read', 'product:read', 'product:list'])]
-    private ?\DateTimeImmutable $createdAt = null;
-
-    #[ORM\Column(nullable: true)]
-    #[Groups(['clientOrder:read', 'delivery:read', 'product:read', 'product:list'])]
-    private ?\DateTimeImmutable $updatedAt = null;
-
     #[ORM\Column(length: 100)]
     #[Groups(['clientOrder:read', 'delivery:read', 'product:read', 'product:list', 'tour:read'])]
     private ?string $name = null;
@@ -33,6 +28,10 @@ class Product
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['clientOrder:read', 'delivery:read', 'product:read', 'product:list', 'tour:read'])]
     private ?string $description = null;
+
+    // virtual calculatedVolume
+    #[Groups(['clientOrder:read', 'delivery:read', 'product:read', 'product:list', 'tour:read'])]
+    private ?float $calculatedVolume = null;
 
     /**
      * @var Collection<int, DeliveryProduct>
@@ -45,81 +44,31 @@ class Product
     #[Groups(['product:read', 'product:list'])]
     private ?Company $company = null;
 
-    #[ORM\ManyToOne(inversedBy: 'products')]
-    #[ORM\JoinColumn(nullable: false)]
+    // Poids en kilogrammes, avec un type DECIMAL pour éviter les erreurs d'arrondi
+    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 3, nullable: true)]
     #[Groups(['clientOrder:read', 'delivery:read', 'product:read', 'product:list', 'tour:read'])]
-    private ?UnitOfMeasure $unitOfMeasure = null;
+    private ?float $weightKg = null;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 3)]
+    #[ORM\Column(type: Types::BOOLEAN)]
     #[Groups(['clientOrder:read', 'delivery:read', 'product:read', 'product:list', 'tour:read'])]
-    private ?string $weight = null;
+    private bool $isHazardous = false;
 
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
-    private ?string $density = null;
-
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
-    private ?string $dimensionsLength = null; // en cm
-
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
-    private ?string $dimensionsWidth = null; // en cm
-
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
-    private ?string $dimensionsHeight = null; // en cm
+    #[ORM\Column(type: Types::STRING, length: 50, nullable: true)]
+    #[Groups(['clientOrder:read', 'delivery:read', 'product:read', 'product:list', 'tour:read'])]
+    private ?string $hazardClass = null;
 
     #[ORM\Column(type: Types::BOOLEAN, options: ["default" => false])]
-    private bool $isTemperatureSensitive = false;
-
-    #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2, nullable: true)]
-    private ?string $temperature = null;
-
-    #[ORM\Column(length: 10)]
     #[Groups(['clientOrder:read', 'delivery:read', 'product:read', 'product:list', 'tour:read'])]
-    private ?string $productType = null; // 'solid', 'liquid', 'gas'
-
-    // Ajout du champ virtuel 'volume'
-    #[Groups(['clientOrder:read', 'delivery:read', 'product:read', 'product:list', 'tour:read'])]
-    private ?float $volume = null;
-
-    // Ajout des coefficients d'expansion
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 6, nullable: true)]
-    private ?string $thermalExpansionCoefficient = null; // Pour les liquides
-
-    #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 6, nullable: true)]
-    private ?string $thermalExpansionCoefficientGas = null; // Pour les gaz
+    private bool $adrCompliant = false;
 
     public function __construct()
     {
         $this->productDeliveries = new ArrayCollection();
-        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?\DateTimeImmutable
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
     }
 
     public function getName(): ?string
@@ -130,7 +79,6 @@ class Product
     public function setName(string $name): static
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -142,7 +90,6 @@ class Product
     public function setDescription(?string $description): static
     {
         $this->description = $description;
-
         return $this;
     }
 
@@ -184,152 +131,75 @@ class Product
     public function setCompany(?Company $company): static
     {
         $this->company = $company;
-
         return $this;
     }
 
-    public function getUnitOfMeasure(): ?UnitOfMeasure
+    public function getWeightKg(): ?float
     {
-        return $this->unitOfMeasure;
+        return $this->weightKg;
     }
 
-    public function setUnitOfMeasure(?UnitOfMeasure $unitOfMeasure): static
+    public function setWeightKg(?float $weightKg): static
     {
-        $this->unitOfMeasure = $unitOfMeasure;
-
+        $this->weightKg = $weightKg;
         return $this;
     }
 
-    public function getWeight(): ?string
+    public function isHazardous(): ?bool
     {
-        return $this->weight;
+        return $this->isHazardous;
     }
 
-    public function setWeight(string $weight): static
+    public function setIsHazardous(bool $isHazardous): static
     {
-        $this->weight = $weight;
-
+        $this->isHazardous = $isHazardous;
         return $this;
     }
 
-    // Getters et Setters pour les nouveaux champs
-    public function getDensity(): ?float
+    public function getHazardClass(): ?string
     {
-        return $this->density !== null ? (float)$this->density : null;
+        return $this->hazardClass;
     }
 
-    public function setDensity(?float $density): static
+    public function setHazardClass(?string $hazardClass): static
     {
-        $this->density = $density !== null ? (string)$density : null;
-
+        $this->hazardClass = $hazardClass;
         return $this;
     }
 
-    public function getDimensionsLength(): ?float
+    public function isAdrCompliant(): bool
     {
-        return $this->dimensionsLength !== null ? (float)$this->dimensionsLength : null;
+        return $this->adrCompliant;
     }
 
-    public function setDimensionsLength(?float $dimensionsLength): static
+    public function setAdrCompliant(bool $adrCompliant): static
     {
-        $this->dimensionsLength = $dimensionsLength !== null ? (string)$dimensionsLength : null;
-
+        $this->adrCompliant = $adrCompliant;
         return $this;
     }
 
-    public function getDimensionsWidth(): ?float
+    public function getCalculatedVolume(): ?float
     {
-        return $this->dimensionsWidth !== null ? (float)$this->dimensionsWidth : null;
+        return $this->calculatedVolume;
     }
 
-    public function setDimensionsWidth(?float $dimensionsWidth): static
+    public function setCalculatedVolume(?float $calculatedVolume): static
     {
-        $this->dimensionsWidth = $dimensionsWidth !== null ? (string)$dimensionsWidth : null;
-
+        $this->calculatedVolume = $calculatedVolume;
         return $this;
     }
 
-    public function getDimensionsHeight(): ?float
+    // Renvoyer le type de produit
+    // Implémentation futur de nouveaux types de produits
+    #[Groups(['clientOrder:read', 'delivery:read', 'product:read', 'product:list', 'tour:read'])]
+    public function getType(): string
     {
-        return $this->dimensionsHeight !== null ? (float)$this->dimensionsHeight : null;
-    }
+        if ($this instanceof LiquidProduct) {
+            return 'liquid';
+        } elseif ($this instanceof SolidProduct) {
+            return 'solid';
+        }
 
-    public function setDimensionsHeight(?float $dimensionsHeight): static
-    {
-        $this->dimensionsHeight = $dimensionsHeight !== null ? (string)$dimensionsHeight : null;
-
-        return $this;
-    }
-
-    public function isTemperatureSensitive(): bool
-    {
-        return $this->isTemperatureSensitive;
-    }
-
-    public function setIsTemperatureSensitive(bool $isTemperatureSensitive): static
-    {
-        $this->isTemperatureSensitive = $isTemperatureSensitive;
-
-        return $this;
-    }
-
-    public function getTemperature(): ?float
-    {
-        return $this->temperature !== null ? (float)$this->temperature : null;
-    }
-
-    public function setTemperature(?float $temperature): static
-    {
-        $this->temperature = $temperature !== null ? (string)$temperature : null;
-
-        return $this;
-    }
-
-    public function getProductType(): ?string
-    {
-        return $this->productType;
-    }
-
-    public function setProductType(string $productType): static
-    {
-        $this->productType = $productType;
-
-        return $this;
-    }
-
-    public function getThermalExpansionCoefficient(): ?float
-    {
-        return $this->thermalExpansionCoefficient !== null ? (float)$this->thermalExpansionCoefficient : null;
-    }
-
-    public function setThermalExpansionCoefficient(?float $thermalExpansionCoefficient): static
-    {
-        $this->thermalExpansionCoefficient = $thermalExpansionCoefficient !== null ? (string)$thermalExpansionCoefficient : null;
-
-        return $this;
-    }
-
-    public function getThermalExpansionCoefficientGas(): ?float
-    {
-        return $this->thermalExpansionCoefficientGas !== null ? (float)$this->thermalExpansionCoefficientGas : null;
-    }
-
-    public function setThermalExpansionCoefficientGas(?float $thermalExpansionCoefficientGas): static
-    {
-        $this->thermalExpansionCoefficientGas = $thermalExpansionCoefficientGas !== null ? (string)$thermalExpansionCoefficientGas : null;
-
-        return $this;
-    }
-
-    public function getVolume(): ?float
-    {
-        return $this->volume !== null ? (float)$this->volume : null;
-    }
-
-    public function setVolume(?float $volume): static
-    {
-        $this->volume = $volume !== null ? (string)$volume : null;
-
-        return $this;
+        return 'unknown';
     }
 }

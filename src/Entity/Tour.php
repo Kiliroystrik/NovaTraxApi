@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: TourRepository::class)]
-#[ORM\Index(name: 'idx_tour_status', columns: ['status'])]
+#[ORM\Index(name: 'idx_tour_status', columns: ['status_id'])]
 #[ORM\Index(name: 'idx_tour_driver_id', columns: ['driver_id'])]
 #[ORM\Index(name: 'idx_tour_company_id', columns: ['company_id'])]
 #[ORM\Index(name: 'idx_tour_vehicle_id', columns: ['vehicle_id'])]
@@ -40,10 +40,6 @@ class Tour
     #[Groups(['tour:read', 'tour:list'])]
     private ?\DateTimeImmutable $endDate = null;
 
-    #[ORM\Column(length: 50)]
-    #[Groups(['tour:read', 'tour:list'])]
-    private ?string $status = null;
-
     #[ORM\ManyToOne(inversedBy: 'tours')]
     #[Groups(['tour:read'])]
     private ?Driver $driver = null;
@@ -71,6 +67,10 @@ class Tour
     #[ORM\ManyToOne(inversedBy: 'tours')]
     #[Groups(['tour:read', 'tour:list'])]
     private ?Warehouse $loading = null;
+
+    #[ORM\ManyToOne(inversedBy: 'tours')]
+    #[Groups(['tour:read', 'tour:list'])]
+    private ?Status $status = null;
 
     public function __construct()
     {
@@ -127,18 +127,6 @@ class Tour
     public function setEndDate(?\DateTimeImmutable $endDate): static
     {
         $this->endDate = $endDate;
-
-        return $this;
-    }
-
-    public function getStatus(): ?string
-    {
-        return $this->status;
-    }
-
-    public function setStatus(string $status): static
-    {
-        $this->status = $status;
 
         return $this;
     }
@@ -229,6 +217,18 @@ class Tour
     public function setLoading(?Warehouse $loading): static
     {
         $this->loading = $loading;
+
+        return $this;
+    }
+
+    public function getStatus(): ?Status
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?Status $status): static
+    {
+        $this->status = $status;
 
         return $this;
     }

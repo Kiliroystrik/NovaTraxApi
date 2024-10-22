@@ -33,9 +33,6 @@ class ClientOrder
     #[Groups(['clientOrder:write', 'clientOrder:list', 'clientOrder:read', 'delivery:read', 'delivery:write'])]
     private ?\DateTimeImmutable $expectedDeliveryDate = null;
 
-    #[ORM\Column(length: 50)]
-    #[Groups(['clientOrder:list', 'clientOrder:read', 'delivery:read', 'delivery:write'])]
-    private ?string $status = null;
 
     /**
      * @var Collection<int, Delivery>
@@ -54,11 +51,14 @@ class ClientOrder
     #[Groups(['clientOrder:write', 'clientOrder:read', "clientOrder:list"])]
     private ?Client $client = null;
 
+    #[ORM\ManyToOne(inversedBy: 'clientOrders')]
+    #[Groups(['clientOrder:write', 'clientOrder:read', "clientOrder:list"])]
+    private ?Status $status = null;
+
     public function __construct()
     {
         $this->deliveries = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
-        $this->status = 'pending';
     }
 
     public function getId(): ?int
@@ -114,18 +114,6 @@ class ClientOrder
         return $this;
     }
 
-    public function getStatus(): ?string
-    {
-        return $this->status;
-    }
-
-    public function setStatus(string $status): static
-    {
-        $this->status = $status;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Delivery>
      */
@@ -176,6 +164,18 @@ class ClientOrder
     public function setClient(?Client $client): static
     {
         $this->client = $client;
+
+        return $this;
+    }
+
+    public function getStatus(): ?Status
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?Status $status): static
+    {
+        $this->status = $status;
 
         return $this;
     }

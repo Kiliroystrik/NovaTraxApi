@@ -5,10 +5,8 @@ namespace App\Controller\API;
 use App\DataFixtures\ClientFixtures;
 use App\DataFixtures\ProductFixtures;
 use App\DataFixtures\CompanyFixtures;
-use App\DataFixtures\UnitOfMeasureFixtures;
 use App\DataFixtures\UserFixtures;
 use App\Entity\Product;
-use App\Entity\UnitOfMeasure;
 use App\Entity\User;
 use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -35,7 +33,6 @@ class ProductControllerTest extends WebTestCase
             CompanyFixtures::class,
             UserFixtures::class,
             ClientFixtures::class,
-            UnitOfMeasureFixtures::class,
             ProductFixtures::class
         ]);
     }
@@ -154,8 +151,6 @@ class ProductControllerTest extends WebTestCase
         // Récupérer la compagnie de l'utilisateur
         $userCompany = $user->getCompany();
 
-        $unitOfMeasureRepository = $this->entityManager->getRepository(UnitOfMeasure::class);
-        $unitOfMeasure = $unitOfMeasureRepository->findAll()[0];
 
         // Envoyer une requête POST à l'API pour ajouter un produit
         $client->request(
@@ -167,7 +162,6 @@ class ProductControllerTest extends WebTestCase
             json_encode([
                 'name' => 'Product 1',
                 'description' => 'Product 1 description',
-                'unitOfMeasure' => $unitOfMeasure->getId(),
             ])
         );
 
@@ -185,7 +179,6 @@ class ProductControllerTest extends WebTestCase
         $this->assertArrayHasKey('id', $data);
         $this->assertArrayHasKey('name', $data); // Vérifier que l'productNumber est généré
         $this->assertArrayHasKey('description', $data);
-        $this->assertArrayHasKey('unitOfMeasure', $data);
 
         // Vérifier que le produit est associé à la compagnie de l'utilisateur
         $this->assertSame($userCompany->getName(), $data['company']['name']);
@@ -201,10 +194,6 @@ class ProductControllerTest extends WebTestCase
         $productRepository = $this->entityManager->getRepository(Product::class);
         $product = $productRepository->findAll()[0];
 
-        // Récupérer une unité de mesure
-        $unitOfMeasureRepository = $this->entityManager->getRepository(UnitOfMeasure::class);
-        $unitOfMeasure = $unitOfMeasureRepository->findAll()[1];
-
         // Envoyer une requête PUT ou PATCH à l'API pour mettre à jour le produit
         $client->request(
             'PATCH',
@@ -215,7 +204,6 @@ class ProductControllerTest extends WebTestCase
             json_encode([
                 'name' => 'produit modifié',
                 'description' => 'produit modifié',
-                'unitOfMeasure' => $unitOfMeasure->getId(),
             ])
         );
 
@@ -232,7 +220,6 @@ class ProductControllerTest extends WebTestCase
         // Vérifier que le produit est mise à jour
         $this->assertSame('produit modifié', $data['name']);
         $this->assertSame('produit modifié', $data['description']);
-        $this->assertSame($unitOfMeasure->getId(), $data['unitOfMeasure']['id']);
     }
 
 

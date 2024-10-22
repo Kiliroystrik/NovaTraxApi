@@ -5,7 +5,6 @@ namespace App\Controller\API;
 use App\Entity\Driver;
 use App\Repository\DriverRepository;
 use App\Repository\UserRepository;
-use App\Entity\UnitOfMeasure;
 use Doctrine\ORM\EntityManagerInterface;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;

@@ -13,7 +13,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ORM\Table(name: 'delivery')]
 #[ORM\Index(name: 'idx_delivery_tour_id', columns: ['tour_id'])]
 #[ORM\Index(name: 'idx_delivery_company_id', columns: ['company_id'])]
-#[ORM\Index(name: 'idx_delivery_status', columns: ['status'])]
+#[ORM\Index(name: 'idx_delivery_status', columns: ['status_id'])]
 #[ORM\Index(name: 'idx_delivery_expected_delivery_date', columns: ['expected_delivery_date'])]
 #[ORM\Index(name: 'idx_delivery_actual_delivery_date', columns: ['actual_delivery_date'])]
 
@@ -32,10 +32,6 @@ class Delivery
     #[ORM\Column(nullable: true)]
     #[Groups(['clientOrder:read', 'delivery:read'])]
     private ?\DateTimeImmutable $updatedAt = null;
-
-    #[ORM\Column(length: 50)]
-    #[Groups(['clientOrder:read', 'delivery:read', 'tour:read'])]
-    private ?string $status = null;
 
     #[ORM\Column]
     #[Groups(['clientOrder:read', 'delivery:read', 'tour:read'])]
@@ -64,6 +60,10 @@ class Delivery
     #[ORM\OneToMany(mappedBy: 'delivery', targetEntity: DeliveryProduct::class, cascade: ['persist', 'remove'])]
     #[Groups(['clientOrder:read', 'delivery:read', 'tour:read'])]
     private Collection $productDeliveries;
+
+    #[ORM\ManyToOne(inversedBy: 'deliveries')]
+    #[Groups(['clientOrder:read', 'delivery:read', 'tour:read'])]
+    private ?Status $status = null;
 
     public function __construct()
     {
@@ -95,18 +95,6 @@ class Delivery
     public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    public function getStatus(): ?string
-    {
-        return $this->status;
-    }
-
-    public function setStatus(string $status): static
-    {
-        $this->status = $status;
 
         return $this;
     }
@@ -209,6 +197,18 @@ class Delivery
                 $productDelivery->setDelivery(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getStatus(): ?Status
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?Status $status): static
+    {
+        $this->status = $status;
 
         return $this;
     }

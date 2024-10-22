@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20241012042156 extends AbstractMigration
+final class Version20241018222023 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -31,18 +31,19 @@ final class Version20241012042156 extends AbstractMigration
         $this->addSql('CREATE SEQUENCE product_category_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE reason_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE refresh_tokens_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE status_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE tour_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE unavailability_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
-        $this->addSql('CREATE SEQUENCE unit_of_measure_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE "user_id_seq" INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE vehicle_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE warehouse_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE TABLE client (id INT NOT NULL, company_id INT NOT NULL, name VARCHAR(100) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_C7440455979B1AD6 ON client (company_id)');
-        $this->addSql('CREATE TABLE client_order (id INT NOT NULL, company_id INT NOT NULL, client_id INT NOT NULL, order_number VARCHAR(20) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, expected_delivery_date TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, status VARCHAR(50) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE client_order (id INT NOT NULL, company_id INT NOT NULL, client_id INT NOT NULL, status_id INT DEFAULT NULL, order_number VARCHAR(20) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, expected_delivery_date TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_56440F2F551F0F81 ON client_order (order_number)');
         $this->addSql('CREATE INDEX IDX_56440F2F979B1AD6 ON client_order (company_id)');
         $this->addSql('CREATE INDEX IDX_56440F2F19EB6921 ON client_order (client_id)');
+        $this->addSql('CREATE INDEX IDX_56440F2F6BF700BD ON client_order (status_id)');
         $this->addSql('COMMENT ON COLUMN client_order.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN client_order.updated_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN client_order.expected_delivery_date IS \'(DC2Type:datetime_immutable)\'');
@@ -50,19 +51,19 @@ final class Version20241012042156 extends AbstractMigration
         $this->addSql('CREATE UNIQUE INDEX UNIQ_4FBF094FCAB86C7B ON company (contact_email)');
         $this->addSql('COMMENT ON COLUMN company.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN company.updated_at IS \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('CREATE TABLE delivery (id INT NOT NULL, tour_id INT DEFAULT NULL, company_id INT NOT NULL, client_order_id INT NOT NULL, geocoded_address_id INT NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, status VARCHAR(50) NOT NULL, expected_delivery_date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, actual_delivery_date TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE delivery (id INT NOT NULL, tour_id INT DEFAULT NULL, company_id INT NOT NULL, client_order_id INT NOT NULL, geocoded_address_id INT NOT NULL, status_id INT DEFAULT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, expected_delivery_date TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, actual_delivery_date TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_3781EC10A3795DFD ON delivery (client_order_id)');
         $this->addSql('CREATE INDEX IDX_3781EC101B517A96 ON delivery (geocoded_address_id)');
         $this->addSql('CREATE INDEX idx_delivery_tour_id ON delivery (tour_id)');
         $this->addSql('CREATE INDEX idx_delivery_company_id ON delivery (company_id)');
-        $this->addSql('CREATE INDEX idx_delivery_status ON delivery (status)');
+        $this->addSql('CREATE INDEX idx_delivery_status ON delivery (status_id)');
         $this->addSql('CREATE INDEX idx_delivery_expected_delivery_date ON delivery (expected_delivery_date)');
         $this->addSql('CREATE INDEX idx_delivery_actual_delivery_date ON delivery (actual_delivery_date)');
         $this->addSql('COMMENT ON COLUMN delivery.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN delivery.updated_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN delivery.expected_delivery_date IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN delivery.actual_delivery_date IS \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('CREATE TABLE delivery_product (id INT NOT NULL, product_id INT NOT NULL, delivery_id INT NOT NULL, quantity NUMERIC(14, 3) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE delivery_product (id INT NOT NULL, product_id INT NOT NULL, delivery_id INT NOT NULL, quantity NUMERIC(14, 3) NOT NULL, temperature NUMERIC(5, 2) DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_D954BB734584665A ON delivery_product (product_id)');
         $this->addSql('CREATE INDEX IDX_D954BB7312136921 ON delivery_product (delivery_id)');
         $this->addSql('CREATE TABLE driver (id INT NOT NULL, company_id INT NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, first_name VARCHAR(50) NOT NULL, last_name VARCHAR(50) NOT NULL, license_number VARCHAR(50) DEFAULT NULL, PRIMARY KEY(id))');
@@ -76,11 +77,8 @@ final class Version20241012042156 extends AbstractMigration
         $this->addSql('CREATE INDEX IDX_A064104A979B1AD6 ON geocoded_address (company_id)');
         $this->addSql('COMMENT ON COLUMN geocoded_address.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN geocoded_address.updated_at IS \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('CREATE TABLE product (id INT NOT NULL, company_id INT NOT NULL, unit_of_measure_id INT NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, name VARCHAR(100) NOT NULL, description TEXT DEFAULT NULL, weight NUMERIC(10, 3) NOT NULL, volume NUMERIC(10, 3) DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE product (id INT NOT NULL, company_id INT NOT NULL, name VARCHAR(100) NOT NULL, description TEXT DEFAULT NULL, weight_kg NUMERIC(10, 3) DEFAULT NULL, is_hazardous BOOLEAN NOT NULL, hazard_class VARCHAR(50) DEFAULT NULL, adr_compliant BOOLEAN DEFAULT false NOT NULL, type VARCHAR(255) NOT NULL, density_kg_per_liter NUMERIC(10, 3) DEFAULT NULL, is_temperature_sensitive BOOLEAN DEFAULT NULL, thermal_expansion_coefficient_per_degree_celsius NUMERIC(10, 6) DEFAULT NULL, length_cm NUMERIC(10, 2) DEFAULT NULL, width_cm NUMERIC(10, 2) DEFAULT NULL, height_cm NUMERIC(10, 2) DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_D34A04AD979B1AD6 ON product (company_id)');
-        $this->addSql('CREATE INDEX IDX_D34A04ADDA4E2C90 ON product (unit_of_measure_id)');
-        $this->addSql('COMMENT ON COLUMN product.created_at IS \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('COMMENT ON COLUMN product.updated_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('CREATE TABLE product_category (id INT NOT NULL, company_id INT NOT NULL, name VARCHAR(100) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_CDFC7356979B1AD6 ON product_category (company_id)');
         $this->addSql('CREATE TABLE reason (id INT NOT NULL, name VARCHAR(100) NOT NULL, type VARCHAR(50) NOT NULL, description VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))');
@@ -88,10 +86,12 @@ final class Version20241012042156 extends AbstractMigration
         $this->addSql('CREATE INDEX idx_reason_type ON reason (type)');
         $this->addSql('CREATE TABLE refresh_tokens (id INT NOT NULL, refresh_token VARCHAR(128) NOT NULL, username VARCHAR(255) NOT NULL, valid TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_9BACE7E1C74F2195 ON refresh_tokens (refresh_token)');
-        $this->addSql('CREATE TABLE tour (id INT NOT NULL, driver_id INT DEFAULT NULL, company_id INT NOT NULL, vehicle_id INT DEFAULT NULL, loading_id INT DEFAULT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, start_date TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, end_date TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, status VARCHAR(50) NOT NULL, tour_number VARCHAR(20) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE TABLE status (id INT NOT NULL, name VARCHAR(50) NOT NULL, type VARCHAR(50) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE UNIQUE INDEX status_unique ON status (name, type)');
+        $this->addSql('CREATE TABLE tour (id INT NOT NULL, driver_id INT DEFAULT NULL, company_id INT NOT NULL, vehicle_id INT DEFAULT NULL, loading_id INT DEFAULT NULL, status_id INT DEFAULT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, start_date TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, end_date TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, tour_number VARCHAR(20) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_6AD1F969A31EF8BE ON tour (tour_number)');
         $this->addSql('CREATE INDEX IDX_6AD1F969FE3B4E08 ON tour (loading_id)');
-        $this->addSql('CREATE INDEX idx_tour_status ON tour (status)');
+        $this->addSql('CREATE INDEX idx_tour_status ON tour (status_id)');
         $this->addSql('CREATE INDEX idx_tour_driver_id ON tour (driver_id)');
         $this->addSql('CREATE INDEX idx_tour_company_id ON tour (company_id)');
         $this->addSql('CREATE INDEX idx_tour_vehicle_id ON tour (vehicle_id)');
@@ -112,10 +112,6 @@ final class Version20241012042156 extends AbstractMigration
         $this->addSql('COMMENT ON COLUMN unavailability.end_date IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN unavailability.created_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('COMMENT ON COLUMN unavailability.updated_at IS \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('CREATE TABLE unit_of_measure (id INT NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, name VARCHAR(50) NOT NULL, symbol VARCHAR(10) NOT NULL, PRIMARY KEY(id))');
-        $this->addSql('CREATE UNIQUE INDEX UNIQ_7EDA7E545E237E06 ON unit_of_measure (name)');
-        $this->addSql('COMMENT ON COLUMN unit_of_measure.created_at IS \'(DC2Type:datetime_immutable)\'');
-        $this->addSql('COMMENT ON COLUMN unit_of_measure.updated_at IS \'(DC2Type:datetime_immutable)\'');
         $this->addSql('CREATE TABLE "user" (id INT NOT NULL, company_id INT NOT NULL, email VARCHAR(180) NOT NULL, roles JSON NOT NULL, password VARCHAR(255) NOT NULL, first_name VARCHAR(50) NOT NULL, last_name VARCHAR(50) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, updated_at TIMESTAMP(0) WITHOUT TIME ZONE DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_8D93D649979B1AD6 ON "user" (company_id)');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_IDENTIFIER_EMAIL ON "user" (email)');
@@ -132,21 +128,23 @@ final class Version20241012042156 extends AbstractMigration
         $this->addSql('ALTER TABLE client ADD CONSTRAINT FK_C7440455979B1AD6 FOREIGN KEY (company_id) REFERENCES company (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE client_order ADD CONSTRAINT FK_56440F2F979B1AD6 FOREIGN KEY (company_id) REFERENCES company (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE client_order ADD CONSTRAINT FK_56440F2F19EB6921 FOREIGN KEY (client_id) REFERENCES client (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE client_order ADD CONSTRAINT FK_56440F2F6BF700BD FOREIGN KEY (status_id) REFERENCES status (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE delivery ADD CONSTRAINT FK_3781EC1015ED8D43 FOREIGN KEY (tour_id) REFERENCES tour (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE delivery ADD CONSTRAINT FK_3781EC10979B1AD6 FOREIGN KEY (company_id) REFERENCES company (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE delivery ADD CONSTRAINT FK_3781EC10A3795DFD FOREIGN KEY (client_order_id) REFERENCES client_order (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE delivery ADD CONSTRAINT FK_3781EC101B517A96 FOREIGN KEY (geocoded_address_id) REFERENCES geocoded_address (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE delivery ADD CONSTRAINT FK_3781EC106BF700BD FOREIGN KEY (status_id) REFERENCES status (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE delivery_product ADD CONSTRAINT FK_D954BB734584665A FOREIGN KEY (product_id) REFERENCES product (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE delivery_product ADD CONSTRAINT FK_D954BB7312136921 FOREIGN KEY (delivery_id) REFERENCES delivery (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE driver ADD CONSTRAINT FK_11667CD9979B1AD6 FOREIGN KEY (company_id) REFERENCES company (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE geocoded_address ADD CONSTRAINT FK_A064104A979B1AD6 FOREIGN KEY (company_id) REFERENCES company (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE product ADD CONSTRAINT FK_D34A04AD979B1AD6 FOREIGN KEY (company_id) REFERENCES company (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
-        $this->addSql('ALTER TABLE product ADD CONSTRAINT FK_D34A04ADDA4E2C90 FOREIGN KEY (unit_of_measure_id) REFERENCES unit_of_measure (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE product_category ADD CONSTRAINT FK_CDFC7356979B1AD6 FOREIGN KEY (company_id) REFERENCES company (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE tour ADD CONSTRAINT FK_6AD1F969C3423909 FOREIGN KEY (driver_id) REFERENCES driver (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE tour ADD CONSTRAINT FK_6AD1F969979B1AD6 FOREIGN KEY (company_id) REFERENCES company (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE tour ADD CONSTRAINT FK_6AD1F969545317D1 FOREIGN KEY (vehicle_id) REFERENCES vehicle (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE tour ADD CONSTRAINT FK_6AD1F969FE3B4E08 FOREIGN KEY (loading_id) REFERENCES warehouse (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE tour ADD CONSTRAINT FK_6AD1F9696BF700BD FOREIGN KEY (status_id) REFERENCES status (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE unavailability ADD CONSTRAINT FK_F0016D1C3423909 FOREIGN KEY (driver_id) REFERENCES driver (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE unavailability ADD CONSTRAINT FK_F0016D1545317D1 FOREIGN KEY (vehicle_id) REFERENCES vehicle (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE unavailability ADD CONSTRAINT FK_F0016D159BB1592 FOREIGN KEY (reason_id) REFERENCES reason (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
@@ -172,30 +170,32 @@ final class Version20241012042156 extends AbstractMigration
         $this->addSql('DROP SEQUENCE product_category_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE reason_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE refresh_tokens_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE status_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE tour_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE unavailability_id_seq CASCADE');
-        $this->addSql('DROP SEQUENCE unit_of_measure_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE "user_id_seq" CASCADE');
         $this->addSql('DROP SEQUENCE vehicle_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE warehouse_id_seq CASCADE');
         $this->addSql('ALTER TABLE client DROP CONSTRAINT FK_C7440455979B1AD6');
         $this->addSql('ALTER TABLE client_order DROP CONSTRAINT FK_56440F2F979B1AD6');
         $this->addSql('ALTER TABLE client_order DROP CONSTRAINT FK_56440F2F19EB6921');
+        $this->addSql('ALTER TABLE client_order DROP CONSTRAINT FK_56440F2F6BF700BD');
         $this->addSql('ALTER TABLE delivery DROP CONSTRAINT FK_3781EC1015ED8D43');
         $this->addSql('ALTER TABLE delivery DROP CONSTRAINT FK_3781EC10979B1AD6');
         $this->addSql('ALTER TABLE delivery DROP CONSTRAINT FK_3781EC10A3795DFD');
         $this->addSql('ALTER TABLE delivery DROP CONSTRAINT FK_3781EC101B517A96');
+        $this->addSql('ALTER TABLE delivery DROP CONSTRAINT FK_3781EC106BF700BD');
         $this->addSql('ALTER TABLE delivery_product DROP CONSTRAINT FK_D954BB734584665A');
         $this->addSql('ALTER TABLE delivery_product DROP CONSTRAINT FK_D954BB7312136921');
         $this->addSql('ALTER TABLE driver DROP CONSTRAINT FK_11667CD9979B1AD6');
         $this->addSql('ALTER TABLE geocoded_address DROP CONSTRAINT FK_A064104A979B1AD6');
         $this->addSql('ALTER TABLE product DROP CONSTRAINT FK_D34A04AD979B1AD6');
-        $this->addSql('ALTER TABLE product DROP CONSTRAINT FK_D34A04ADDA4E2C90');
         $this->addSql('ALTER TABLE product_category DROP CONSTRAINT FK_CDFC7356979B1AD6');
         $this->addSql('ALTER TABLE tour DROP CONSTRAINT FK_6AD1F969C3423909');
         $this->addSql('ALTER TABLE tour DROP CONSTRAINT FK_6AD1F969979B1AD6');
         $this->addSql('ALTER TABLE tour DROP CONSTRAINT FK_6AD1F969545317D1');
         $this->addSql('ALTER TABLE tour DROP CONSTRAINT FK_6AD1F969FE3B4E08');
+        $this->addSql('ALTER TABLE tour DROP CONSTRAINT FK_6AD1F9696BF700BD');
         $this->addSql('ALTER TABLE unavailability DROP CONSTRAINT FK_F0016D1C3423909');
         $this->addSql('ALTER TABLE unavailability DROP CONSTRAINT FK_F0016D1545317D1');
         $this->addSql('ALTER TABLE unavailability DROP CONSTRAINT FK_F0016D159BB1592');
@@ -215,9 +215,9 @@ final class Version20241012042156 extends AbstractMigration
         $this->addSql('DROP TABLE product_category');
         $this->addSql('DROP TABLE reason');
         $this->addSql('DROP TABLE refresh_tokens');
+        $this->addSql('DROP TABLE status');
         $this->addSql('DROP TABLE tour');
         $this->addSql('DROP TABLE unavailability');
-        $this->addSql('DROP TABLE unit_of_measure');
         $this->addSql('DROP TABLE "user"');
         $this->addSql('DROP TABLE vehicle');
         $this->addSql('DROP TABLE warehouse');
